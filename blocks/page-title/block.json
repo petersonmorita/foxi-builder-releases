@@ -1,0 +1,50 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "foxi/page-title",
+	"title": "Page Title",
+	"category": "foxi-site",
+	"description": "The title of the current page, post or archive. Use it in templates and page headers.",
+	"textdomain": "foxi-builder",
+	"keywords": [
+		"title",
+		"archive",
+		"post title",
+		"heading"
+	],
+	"attributes": {
+		"fx": {
+			"type": "object",
+			"default": {}
+		},
+		"level": {
+			"type": "number",
+			"default": 1
+		},
+		"showMeta": {
+			"type": "boolean",
+			"default": true
+		},
+		"showDescription": {
+			"type": "boolean",
+			"default": true
+		},
+		"prefix": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"customClassName": true
+	},
+	"style": "foxi-blocks",
+	"foxi": {
+		"elements": {
+			"title": "& .fx-page-title__title",
+			"meta": "& .fx-page-title__meta",
+			"description": "& .fx-page-title__desc"
+		}
+	}
+}

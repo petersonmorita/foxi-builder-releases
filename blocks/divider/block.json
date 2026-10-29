@@ -1,0 +1,36 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "foxi/divider",
+	"title": "Divider",
+	"category": "foxi-layout",
+	"description": "A line to separate content, with an optional icon.",
+	"textdomain": "foxi-builder",
+	"keywords": [
+		"separator",
+		"hr",
+		"line"
+	],
+	"attributes": {
+		"fx": {
+			"type": "object",
+			"default": {}
+		},
+		"icon": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"customClassName": true
+	},
+	"style": "foxi-blocks",
+	"foxi": {
+		"elements": {
+			"line": "& .fx-divider__line",
+			"icon": "& .fx-svg"
+		}
+	}
+}

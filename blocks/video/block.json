@@ -1,0 +1,68 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "foxi/video",
+	"title": "Video",
+	"category": "foxi-media",
+	"description": "YouTube, Vimeo or uploaded video. Loads only when played, keeping pages fast.",
+	"textdomain": "foxi-builder",
+	"keywords": [
+		"youtube",
+		"vimeo",
+		"movie"
+	],
+	"attributes": {
+		"fx": {
+			"type": "object",
+			"default": {}
+		},
+		"url": {
+			"type": "string",
+			"default": ""
+		},
+		"file": {
+			"type": "object",
+			"default": {}
+		},
+		"poster": {
+			"type": "object",
+			"default": {}
+		},
+		"mode": {
+			"type": "string",
+			"default": "inline"
+		},
+		"autoplay": {
+			"type": "boolean",
+			"default": false
+		},
+		"muted": {
+			"type": "boolean",
+			"default": false
+		},
+		"loop": {
+			"type": "boolean",
+			"default": false
+		},
+		"controls": {
+			"type": "boolean",
+			"default": true
+		},
+		"title": {
+			"type": "string",
+			"default": "Video"
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"customClassName": true
+	},
+	"style": "foxi-blocks",
+	"foxi": {
+		"elements": {
+			"frame": "& .fx-video__frame",
+			"play": "& .fx-video__play"
+		}
+	}
+}

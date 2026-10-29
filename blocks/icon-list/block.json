@@ -1,0 +1,52 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "foxi/icon-list",
+	"title": "Icon List",
+	"category": "foxi-content",
+	"description": "A list of items with icons — features, contact details, amenities.",
+	"textdomain": "foxi-builder",
+	"keywords": [
+		"list",
+		"features",
+		"bullet"
+	],
+	"attributes": {
+		"fx": {
+			"type": "object",
+			"default": {}
+		},
+		"layout": {
+			"type": "string",
+			"default": "vertical"
+		},
+		"icon": {
+			"type": "string",
+			"default": "lucide:check"
+		},
+		"divider": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"customClassName": true
+	},
+	"style": "foxi-blocks",
+	"foxi": {
+		"elements": {
+			"item": "& > li",
+			"icon": "& .fx-icon-list__icon",
+			"text": "& .fx-icon-list__text",
+			"link": "& a"
+		}
+	},
+	"providesContext": {
+		"foxi/listIcon": "icon"
+	},
+	"allowedBlocks": [
+		"foxi/icon-list-item"
+	]
+}

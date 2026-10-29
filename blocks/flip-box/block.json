@@ -1,0 +1,50 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "foxi/flip-box",
+	"title": "Flip Box",
+	"category": "foxi-interactive",
+	"description": "A card that turns over on hover or tap to reveal more.",
+	"textdomain": "foxi-builder",
+	"keywords": [
+		"flip",
+		"card",
+		"hover",
+		"reveal",
+		"flipbox"
+	],
+	"attributes": {
+		"fx": {
+			"type": "object",
+			"default": {}
+		},
+		"effect": {
+			"type": "string",
+			"default": "flip"
+		},
+		"direction": {
+			"type": "string",
+			"default": "left"
+		},
+		"trigger": {
+			"type": "string",
+			"default": "hover"
+		},
+		"height": {
+			"type": "string",
+			"default": "320px"
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"customClassName": true
+	},
+	"style": "foxi-blocks",
+	"foxi": {
+		"elements": {
+			"front": "& .fx-flip-side--front",
+			"back": "& .fx-flip-side--back"
+		}
+	}
+}

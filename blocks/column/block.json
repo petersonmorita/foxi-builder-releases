@@ -1,0 +1,39 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "foxi/column",
+	"title": "Column / Box",
+	"category": "foxi-layout",
+	"description": "A column inside Columns, or a box anywhere: cards, panels, image cards.",
+	"textdomain": "foxi-builder",
+	"keywords": [
+		"card",
+		"box"
+	],
+	"attributes": {
+		"fx": {
+			"type": "object",
+			"default": {}
+		},
+		"link": {
+			"type": "object",
+			"default": {}
+		},
+		"vAlign": {
+			"type": "string",
+			"default": "top"
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"customClassName": true
+	},
+	"style": "foxi-blocks",
+	"foxi": {
+		"elements": {
+			"inner": "& > .fx-column__inner",
+			"overlay": "& > .fx-bg > .fx-bg__overlay"
+		}
+	}
+}

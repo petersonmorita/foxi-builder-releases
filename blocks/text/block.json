@@ -1,0 +1,35 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "foxi/text",
+	"title": "Text",
+	"category": "foxi-content",
+	"description": "A paragraph of text.",
+	"textdomain": "foxi-builder",
+	"keywords": [
+		"paragraph",
+		"copy"
+	],
+	"attributes": {
+		"fx": {
+			"type": "object",
+			"default": {}
+		},
+		"content": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"customClassName": true
+	},
+	"style": "foxi-blocks",
+	"foxi": {
+		"elements": {
+			"link": "& a",
+			"strong": "& strong"
+		}
+	}
+}

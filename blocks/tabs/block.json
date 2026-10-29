@@ -1,0 +1,44 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "foxi/tabs",
+	"title": "Tabs",
+	"category": "foxi-interactive",
+	"description": "Content organised in tabs.",
+	"textdomain": "foxi-builder",
+	"keywords": [
+		"tabbed",
+		"panels"
+	],
+	"attributes": {
+		"fx": {
+			"type": "object",
+			"default": {}
+		},
+		"layout": {
+			"type": "string",
+			"default": "top"
+		},
+		"align": {
+			"type": "string",
+			"default": "start"
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"customClassName": true
+	},
+	"style": "foxi-blocks",
+	"foxi": {
+		"elements": {
+			"nav": "& > .fx-tabs__nav",
+			"tab": "& > .fx-tabs__nav .fx-tabs__tab",
+			"tabActive": "& > .fx-tabs__nav .fx-tabs__tab.is-active",
+			"panel": "& .fx-tab"
+		}
+	},
+	"allowedBlocks": [
+		"foxi/tab"
+	]
+}

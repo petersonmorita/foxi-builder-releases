@@ -1,0 +1,82 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "foxi/carousel",
+	"title": "Carousel",
+	"category": "foxi-interactive",
+	"description": "Scrolling cards — rooms, testimonials, team, logos.",
+	"textdomain": "foxi-builder",
+	"keywords": [
+		"slider",
+		"cards",
+		"testimonials",
+		"logos"
+	],
+	"attributes": {
+		"fx": {
+			"type": "object",
+			"default": {}
+		},
+		"perView": {
+			"type": "object",
+			"default": {
+				"desktop": 3,
+				"tablet": 2,
+				"mobile": 1
+			}
+		},
+		"gap": {
+			"type": "object",
+			"default": {
+				"desktop": 24,
+				"tablet": 20,
+				"mobile": 16
+			}
+		},
+		"autoplay": {
+			"type": "boolean",
+			"default": false
+		},
+		"delay": {
+			"type": "number",
+			"default": 5000
+		},
+		"speed": {
+			"type": "number",
+			"default": 600
+		},
+		"loop": {
+			"type": "boolean",
+			"default": false
+		},
+		"arrows": {
+			"type": "boolean",
+			"default": true
+		},
+		"dots": {
+			"type": "boolean",
+			"default": true
+		},
+		"centered": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"customClassName": true
+	},
+	"style": "foxi-blocks",
+	"foxi": {
+		"elements": {
+			"item": "& .fx-carousel-item",
+			"arrow": "& .fx-slider__arrow",
+			"dot": "& .swiper-pagination-bullet",
+			"dotActive": "& .swiper-pagination-bullet-active"
+		}
+	},
+	"allowedBlocks": [
+		"foxi/carousel-item"
+	]
+}

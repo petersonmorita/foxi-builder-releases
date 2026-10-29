@@ -1,0 +1,30 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "foxi/carousel-item",
+	"title": "Carousel Item",
+	"category": "foxi-interactive",
+	"description": "One card in a Carousel.",
+	"textdomain": "foxi-builder",
+	"keywords": [],
+	"attributes": {
+		"fx": {
+			"type": "object",
+			"default": {}
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"customClassName": true
+	},
+	"style": "foxi-blocks",
+	"foxi": {
+		"elements": {
+			"inner": "& > .fx-carousel-item__inner"
+		}
+	},
+	"parent": [
+		"foxi/carousel"
+	]
+}

@@ -1,0 +1,97 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "foxi/booking",
+	"title": "Booking Bar",
+	"category": "foxi-interactive",
+	"description": "Arrival, departure and guests fields that send visitors to your booking engine.",
+	"textdomain": "foxi-builder",
+	"keywords": [
+		"reservation",
+		"hotel",
+		"check in",
+		"availability"
+	],
+	"attributes": {
+		"fx": {
+			"type": "object",
+			"default": {}
+		},
+		"url": {
+			"type": "string",
+			"default": "{{booking_url}}"
+		},
+		"arrivalParam": {
+			"type": "string",
+			"default": "arrival"
+		},
+		"departureParam": {
+			"type": "string",
+			"default": "departure"
+		},
+		"guestsParam": {
+			"type": "string",
+			"default": "guests"
+		},
+		"maxGuests": {
+			"type": "number",
+			"default": 6
+		},
+		"showGuests": {
+			"type": "boolean",
+			"default": true
+		},
+		"buttonText": {
+			"type": "string",
+			"default": "Check availability"
+		},
+		"newTab": {
+			"type": "boolean",
+			"default": false
+		},
+		"labels": {
+			"type": "object",
+			"default": {
+				"arrival": "Arrival",
+				"departure": "Departure",
+				"guests": "Guests"
+			}
+		},
+		"icons": {
+			"type": "boolean",
+			"default": false
+		},
+		"dividers": {
+			"type": "boolean",
+			"default": false
+		},
+		"guestsWord": {
+			"type": "boolean",
+			"default": false
+		},
+		"buttonIcon": {
+			"type": "string",
+			"default": ""
+		},
+		"prefillDates": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"customClassName": true
+	},
+	"style": "foxi-blocks",
+	"foxi": {
+		"elements": {
+			"field": "& .fx-booking__field",
+			"label": "& .fx-booking__label",
+			"input": "& .fx-booking__input",
+			"submit": "& .fx-booking__submit",
+			"icon": "& .fx-booking__icon",
+			"divider": "& .fx-booking__field + .fx-booking__field"
+		}
+	}
+}

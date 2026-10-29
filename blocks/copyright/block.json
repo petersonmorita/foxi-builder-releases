@@ -1,0 +1,33 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "foxi/copyright",
+	"title": "Copyright",
+	"category": "foxi-site",
+	"description": "Copyright line with the current year filled in automatically.",
+	"textdomain": "foxi-builder",
+	"keywords": [
+		"footer"
+	],
+	"attributes": {
+		"fx": {
+			"type": "object",
+			"default": {}
+		},
+		"content": {
+			"type": "string",
+			"default": "© {{year}} {{name}}. All rights reserved."
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"customClassName": true
+	},
+	"style": "foxi-blocks",
+	"foxi": {
+		"elements": {
+			"link": "& a"
+		}
+	}
+}

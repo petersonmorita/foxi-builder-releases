@@ -1,0 +1,47 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "foxi/popup",
+	"title": "Popup",
+	"category": "foxi-interactive",
+	"description": "Content that opens in a popup window when someone clicks a button or link to #popup-name. Great for enquiry forms.",
+	"textdomain": "foxi-builder",
+	"keywords": [
+		"modal",
+		"lightbox",
+		"dialog",
+		"popup",
+		"enquiry"
+	],
+	"attributes": {
+		"fx": {
+			"type": "object",
+			"default": {}
+		},
+		"anchor": {
+			"type": "string",
+			"default": "enquire"
+		},
+		"width": {
+			"type": "string",
+			"default": "640px"
+		},
+		"label": {
+			"type": "string",
+			"default": "Enquiry form"
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": false,
+		"customClassName": true
+	},
+	"style": "foxi-blocks",
+	"foxi": {
+		"elements": {
+			"dialog": "& .fx-popup__dialog",
+			"backdrop": "& .fx-popup__backdrop",
+			"close": "& .fx-popup__close"
+		}
+	}
+}

@@ -1,0 +1,87 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "foxi/form",
+	"title": "Contact Form",
+	"category": "foxi-interactive",
+	"description": "A contact form. Messages are emailed to you and saved under Foxi > Messages.",
+	"textdomain": "foxi-builder",
+	"keywords": [
+		"contact",
+		"enquiry",
+		"email"
+	],
+	"attributes": {
+		"fx": {
+			"type": "object",
+			"default": {}
+		},
+		"fields": {
+			"type": "array",
+			"default": [
+				{
+					"id": "name",
+					"type": "text",
+					"label": "Name",
+					"required": true,
+					"width": "half"
+				},
+				{
+					"id": "email",
+					"type": "email",
+					"label": "Email",
+					"required": true,
+					"width": "half"
+				},
+				{
+					"id": "phone",
+					"type": "tel",
+					"label": "Phone",
+					"required": false,
+					"width": "full"
+				},
+				{
+					"id": "message",
+					"type": "textarea",
+					"label": "Message",
+					"required": true,
+					"width": "full"
+				}
+			]
+		},
+		"submitText": {
+			"type": "string",
+			"default": "Send message"
+		},
+		"successMessage": {
+			"type": "string",
+			"default": "Thanks — we'll be in touch shortly."
+		},
+		"recipient": {
+			"type": "string",
+			"default": ""
+		},
+		"subject": {
+			"type": "string",
+			"default": "New enquiry from your website"
+		},
+		"labels": {
+			"type": "string",
+			"default": "above"
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"customClassName": true
+	},
+	"style": "foxi-blocks",
+	"foxi": {
+		"elements": {
+			"field": "& .fx-form__field",
+			"label": "& .fx-form__label",
+			"input": "& .fx-form__input",
+			"submit": "& .fx-form__submit"
+		}
+	}
+}

@@ -1,0 +1,28 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "foxi/spacer",
+	"title": "Spacer",
+	"category": "foxi-layout",
+	"description": "Empty vertical space.",
+	"textdomain": "foxi-builder",
+	"keywords": [
+		"gap",
+		"space"
+	],
+	"attributes": {
+		"fx": {
+			"type": "object",
+			"default": {}
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"customClassName": true
+	},
+	"style": "foxi-blocks",
+	"foxi": {
+		"elements": {}
+	}
+}

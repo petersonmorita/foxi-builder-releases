@@ -1,0 +1,50 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "foxi/rating",
+	"title": "Star Rating",
+	"category": "foxi-content",
+	"description": "Show a star rating, e.g. your Google reviews score.",
+	"textdomain": "foxi-builder",
+	"keywords": [
+		"stars",
+		"reviews",
+		"score"
+	],
+	"attributes": {
+		"fx": {
+			"type": "object",
+			"default": {}
+		},
+		"value": {
+			"type": "number",
+			"default": 5
+		},
+		"max": {
+			"type": "number",
+			"default": 5
+		},
+		"showValue": {
+			"type": "boolean",
+			"default": true
+		},
+		"text": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"customClassName": true
+	},
+	"style": "foxi-blocks",
+	"foxi": {
+		"elements": {
+			"stars": "& .fx-rating__stars",
+			"empty": "& .fx-rating__base",
+			"value": "& .fx-rating__value",
+			"text": "& .fx-rating__text"
+		}
+	}
+}

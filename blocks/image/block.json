@@ -1,0 +1,56 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "foxi/image",
+	"title": "Image",
+	"category": "foxi-media",
+	"description": "An image with ratio, focal point, hover effects, link or lightbox.",
+	"textdomain": "foxi-builder",
+	"keywords": [
+		"photo",
+		"picture"
+	],
+	"attributes": {
+		"fx": {
+			"type": "object",
+			"default": {}
+		},
+		"image": {
+			"type": "object",
+			"default": {}
+		},
+		"size": {
+			"type": "string",
+			"default": "large"
+		},
+		"link": {
+			"type": "object",
+			"default": {}
+		},
+		"lightbox": {
+			"type": "boolean",
+			"default": false
+		},
+		"caption": {
+			"type": "string",
+			"default": ""
+		},
+		"hover": {
+			"type": "string",
+			"default": "none"
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"customClassName": true
+	},
+	"style": "foxi-blocks",
+	"foxi": {
+		"elements": {
+			"frame": "& .fx-image__frame",
+			"img": "& .fx-image__img",
+			"caption": "& .fx-image__caption"
+		}
+	}
+}

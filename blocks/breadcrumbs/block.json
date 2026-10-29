@@ -1,0 +1,50 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "foxi/breadcrumbs",
+	"title": "Breadcrumbs",
+	"category": "foxi-site",
+	"description": "Shows where a page sits in the site (Home › Rooms › King Room). Helps visitors and search engines.",
+	"textdomain": "foxi-builder",
+	"keywords": [
+		"breadcrumb",
+		"trail",
+		"navigation",
+		"seo"
+	],
+	"attributes": {
+		"fx": {
+			"type": "object",
+			"default": {}
+		},
+		"separator": {
+			"type": "string",
+			"default": "chevron"
+		},
+		"showHome": {
+			"type": "boolean",
+			"default": true
+		},
+		"homeLabel": {
+			"type": "string",
+			"default": "Home"
+		},
+		"showCurrent": {
+			"type": "boolean",
+			"default": true
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"customClassName": true
+	},
+	"style": "foxi-blocks",
+	"foxi": {
+		"elements": {
+			"link": "& a",
+			"current": "& [aria-current]",
+			"separator": "& .fx-breadcrumbs__sep"
+		}
+	}
+}

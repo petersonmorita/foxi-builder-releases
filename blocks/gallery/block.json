@@ -1,0 +1,54 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "foxi/gallery",
+	"title": "Gallery",
+	"category": "foxi-media",
+	"description": "A grid or masonry gallery with lightbox.",
+	"textdomain": "foxi-builder",
+	"keywords": [
+		"photos",
+		"images",
+		"masonry",
+		"lightbox"
+	],
+	"attributes": {
+		"fx": {
+			"type": "object",
+			"default": {}
+		},
+		"images": {
+			"type": "array",
+			"default": []
+		},
+		"layout": {
+			"type": "string",
+			"default": "grid"
+		},
+		"lightbox": {
+			"type": "boolean",
+			"default": true
+		},
+		"captions": {
+			"type": "boolean",
+			"default": false
+		},
+		"hover": {
+			"type": "string",
+			"default": "zoom"
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"customClassName": true
+	},
+	"style": "foxi-blocks",
+	"foxi": {
+		"elements": {
+			"item": "& .fx-gallery__item",
+			"img": "& .fx-gallery__img",
+			"caption": "& .fx-gallery__caption"
+		}
+	}
+}

@@ -1,0 +1,80 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "foxi/counter",
+	"title": "Counter",
+	"category": "foxi-interactive",
+	"description": "An animated number, circle or progress bar.",
+	"textdomain": "foxi-builder",
+	"keywords": [
+		"number",
+		"stats",
+		"progress",
+		"statistic"
+	],
+	"attributes": {
+		"fx": {
+			"type": "object",
+			"default": {}
+		},
+		"start": {
+			"type": "number",
+			"default": 0
+		},
+		"end": {
+			"type": "number",
+			"default": 100
+		},
+		"decimals": {
+			"type": "number",
+			"default": 0
+		},
+		"prefix": {
+			"type": "string",
+			"default": ""
+		},
+		"suffix": {
+			"type": "string",
+			"default": ""
+		},
+		"separator": {
+			"type": "string",
+			"default": ","
+		},
+		"duration": {
+			"type": "number",
+			"default": 2000
+		},
+		"type": {
+			"type": "string",
+			"default": "number"
+		},
+		"max": {
+			"type": "number",
+			"default": 100
+		},
+		"label": {
+			"type": "string",
+			"default": ""
+		},
+		"labelPosition": {
+			"type": "string",
+			"default": "below"
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"customClassName": true
+	},
+	"style": "foxi-blocks",
+	"foxi": {
+		"elements": {
+			"value": "& .fx-counter__value",
+			"affix": "& .fx-counter__prefix, & .fx-counter__suffix",
+			"label": "& .fx-counter__label",
+			"track": "& .fx-counter__track",
+			"fill": "& .fx-counter__fill"
+		}
+	}
+}

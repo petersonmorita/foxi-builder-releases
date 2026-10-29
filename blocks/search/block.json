@@ -1,0 +1,48 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "foxi/search",
+	"title": "Search",
+	"category": "foxi-site",
+	"description": "A search box for your site.",
+	"textdomain": "foxi-builder",
+	"keywords": [
+		"search",
+		"find",
+		"form"
+	],
+	"attributes": {
+		"fx": {
+			"type": "object",
+			"default": {}
+		},
+		"placeholder": {
+			"type": "string",
+			"default": "Search…"
+		},
+		"buttonText": {
+			"type": "string",
+			"default": "Search"
+		},
+		"buttonStyle": {
+			"type": "string",
+			"default": "icon"
+		},
+		"postType": {
+			"type": "string",
+			"default": "any"
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"customClassName": true
+	},
+	"style": "foxi-blocks",
+	"foxi": {
+		"elements": {
+			"input": "& .fx-search__input",
+			"button": "& .fx-search__button"
+		}
+	}
+}

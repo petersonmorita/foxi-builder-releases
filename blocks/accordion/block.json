@@ -1,0 +1,58 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "foxi/accordion",
+	"title": "Accordion / FAQ",
+	"category": "foxi-interactive",
+	"description": "Expandable questions and answers. Can publish FAQ schema for Google.",
+	"textdomain": "foxi-builder",
+	"keywords": [
+		"faq",
+		"toggle",
+		"questions",
+		"collapse"
+	],
+	"attributes": {
+		"fx": {
+			"type": "object",
+			"default": {}
+		},
+		"multiple": {
+			"type": "boolean",
+			"default": false
+		},
+		"icon": {
+			"type": "string",
+			"default": "plus"
+		},
+		"iconPosition": {
+			"type": "string",
+			"default": "right"
+		},
+		"faqSchema": {
+			"type": "boolean",
+			"default": true
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"customClassName": true
+	},
+	"style": "foxi-blocks",
+	"foxi": {
+		"elements": {
+			"item": "& .fx-accordion-item",
+			"title": "& .fx-accordion-item__title",
+			"titleOpen": "& .fx-accordion-item[open] > .fx-accordion-item__title",
+			"icon": "& .fx-accordion-item__icon",
+			"content": "& .fx-accordion-item__content"
+		}
+	},
+	"providesContext": {
+		"foxi/faq": "faqSchema"
+	},
+	"allowedBlocks": [
+		"foxi/accordion-item"
+	]
+}

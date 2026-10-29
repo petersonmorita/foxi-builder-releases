@@ -1,0 +1,111 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "foxi/posts",
+	"title": "Posts",
+	"category": "foxi-content",
+	"description": "Your latest blog posts or news as cards, a list or image tiles.",
+	"textdomain": "foxi-builder",
+	"keywords": [
+		"blog",
+		"news",
+		"articles",
+		"query",
+		"latest"
+	],
+	"attributes": {
+		"fx": {
+			"type": "object",
+			"default": {}
+		},
+		"source": {
+			"type": "string",
+			"default": "latest"
+		},
+		"category": {
+			"type": "number",
+			"default": 0
+		},
+		"count": {
+			"type": "number",
+			"default": 3
+		},
+		"offset": {
+			"type": "number",
+			"default": 0
+		},
+		"orderBy": {
+			"type": "string",
+			"default": "date"
+		},
+		"excludeCurrent": {
+			"type": "boolean",
+			"default": true
+		},
+		"layout": {
+			"type": "string",
+			"default": "grid"
+		},
+		"columns": {
+			"type": "object",
+			"default": {
+				"desktop": 3,
+				"tablet": 2,
+				"mobile": 1
+			}
+		},
+		"show": {
+			"type": "object",
+			"default": {
+				"image": true,
+				"date": true,
+				"category": true,
+				"author": false,
+				"excerpt": true,
+				"readMore": true
+			}
+		},
+		"excerptLength": {
+			"type": "number",
+			"default": 22
+		},
+		"readMoreText": {
+			"type": "string",
+			"default": "Read more"
+		},
+		"imageRatio": {
+			"type": "string",
+			"default": "3/2"
+		},
+		"headingLevel": {
+			"type": "number",
+			"default": 3
+		},
+		"pagination": {
+			"type": "boolean",
+			"default": true
+		},
+		"emptyText": {
+			"type": "string",
+			"default": "No posts yet."
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"customClassName": true
+	},
+	"style": "foxi-blocks",
+	"foxi": {
+		"elements": {
+			"card": "& .fx-posts__card",
+			"image": "& .fx-posts__media",
+			"body": "& .fx-posts__body",
+			"title": "& .fx-posts__title",
+			"meta": "& .fx-posts__meta",
+			"excerpt": "& .fx-posts__excerpt",
+			"more": "& .fx-posts__more",
+			"pager": "& .fx-posts__pager a, & .fx-posts__pager span"
+		}
+	}
+}

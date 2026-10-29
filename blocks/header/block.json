@@ -1,0 +1,47 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "foxi/header",
+	"title": "Header",
+	"category": "foxi-site",
+	"description": "Your site header: sticky, transparent over the hero, shrinking on scroll.",
+	"textdomain": "foxi-builder",
+	"keywords": [
+		"navigation",
+		"menu",
+		"logo"
+	],
+	"attributes": {
+		"fx": {
+			"type": "object",
+			"default": {}
+		},
+		"sticky": {
+			"type": "boolean",
+			"default": true
+		},
+		"shrink": {
+			"type": "boolean",
+			"default": true
+		},
+		"overlay": {
+			"type": "string",
+			"default": "none"
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"customClassName": true
+	},
+	"style": "foxi-blocks",
+	"foxi": {
+		"elements": {
+			"row": "& .fx-header-row",
+			"link": "& .fx-nav__menu > li > a"
+		}
+	},
+	"allowedBlocks": [
+		"foxi/header-row"
+	]
+}

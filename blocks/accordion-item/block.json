@@ -1,0 +1,42 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "foxi/accordion-item",
+	"title": "Question",
+	"category": "foxi-interactive",
+	"description": "One question of an Accordion.",
+	"textdomain": "foxi-builder",
+	"keywords": [],
+	"attributes": {
+		"fx": {
+			"type": "object",
+			"default": {}
+		},
+		"title": {
+			"type": "string",
+			"default": ""
+		},
+		"open": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"customClassName": true
+	},
+	"style": "foxi-blocks",
+	"foxi": {
+		"elements": {
+			"title": "& > .fx-accordion-item__title",
+			"content": "& > .fx-accordion-item__content"
+		}
+	},
+	"parent": [
+		"foxi/accordion"
+	],
+	"usesContext": [
+		"foxi/faq"
+	]
+}

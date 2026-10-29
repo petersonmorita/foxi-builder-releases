@@ -1,0 +1,48 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "foxi/social-icons",
+	"title": "Social Icons",
+	"category": "foxi-content",
+	"description": "Links to your social profiles — uses your Business details automatically.",
+	"textdomain": "foxi-builder",
+	"keywords": [
+		"facebook",
+		"instagram",
+		"social"
+	],
+	"attributes": {
+		"fx": {
+			"type": "object",
+			"default": {}
+		},
+		"source": {
+			"type": "string",
+			"default": "business"
+		},
+		"items": {
+			"type": "array",
+			"default": []
+		},
+		"variant": {
+			"type": "string",
+			"default": "circle"
+		},
+		"brandColors": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"customClassName": true
+	},
+	"style": "foxi-blocks",
+	"foxi": {
+		"elements": {
+			"link": "& .fx-social__link",
+			"linkHover": "& .fx-social__link:hover"
+		}
+	}
+}

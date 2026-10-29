@@ -1,0 +1,59 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "foxi/button",
+	"title": "Button",
+	"category": "foxi-content",
+	"description": "A call-to-action button using your Brand Kit styles.",
+	"textdomain": "foxi-builder",
+	"keywords": [
+		"cta",
+		"link"
+	],
+	"attributes": {
+		"fx": {
+			"type": "object",
+			"default": {}
+		},
+		"text": {
+			"type": "string",
+			"default": "Learn more"
+		},
+		"link": {
+			"type": "object",
+			"default": {}
+		},
+		"variant": {
+			"type": "string",
+			"default": "primary"
+		},
+		"size": {
+			"type": "string",
+			"default": "m"
+		},
+		"icon": {
+			"type": "string",
+			"default": ""
+		},
+		"iconPosition": {
+			"type": "string",
+			"default": "after"
+		},
+		"fullMobile": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"customClassName": true
+	},
+	"style": "foxi-blocks",
+	"foxi": {
+		"elements": {
+			"text": "& .fx-button__text",
+			"icon": "& .fx-svg"
+		}
+	}
+}

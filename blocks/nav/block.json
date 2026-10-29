@@ -1,0 +1,50 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "foxi/nav",
+	"title": "Menu",
+	"category": "foxi-site",
+	"description": "A navigation menu with dropdowns and a mobile drawer.",
+	"textdomain": "foxi-builder",
+	"keywords": [
+		"navigation",
+		"menu"
+	],
+	"attributes": {
+		"fx": {
+			"type": "object",
+			"default": {}
+		},
+		"menuId": {
+			"type": "number",
+			"default": 0
+		},
+		"collapse": {
+			"type": "string",
+			"default": "tablet"
+		},
+		"mobileStyle": {
+			"type": "string",
+			"default": "drawer"
+		},
+		"label": {
+			"type": "string",
+			"default": "Main"
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"customClassName": true
+	},
+	"style": "foxi-blocks",
+	"foxi": {
+		"elements": {
+			"link": "& .fx-nav__menu > li > a",
+			"linkHover": "& .fx-nav__menu > li > a:hover, & .fx-nav__menu > li.current-menu-item > a",
+			"dropdown": "& .sub-menu",
+			"dropdownLink": "& .sub-menu a",
+			"toggle": "& .fx-nav__toggle"
+		}
+	}
+}
