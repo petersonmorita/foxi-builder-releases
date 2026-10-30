@@ -4,7 +4,7 @@ Tags: page builder, visual editor, blocks, seo, starter sites
 Requires at least: 6.6
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.1.1
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -15,7 +15,7 @@ A visual page builder for WordPress: click-to-edit pages, a Brand Kit that re-th
 Foxi Builder adds Foxi Studio to the WordPress editor: a side rail of tools around a live, full-width view of your page.
 
 = Build =
-* 40+ blocks: sections, columns, headings, text, buttons, icons, icon lists, images, galleries, video, maps, sliders, carousels, accordions/FAQ, tabs, counters, star ratings, flip boxes, contact forms, booking bar, posts, breadcrumbs, search, page title and more.
+* 40+ blocks: sections, columns, headings, text, buttons, icons, icon lists, images, galleries, video, maps, sliders, carousels, accordions/FAQ, tabs, counters, star ratings, flip boxes, contact forms, booking widget, posts, breadcrumbs, search, page title and more.
 * Every block has Content, Style, Motion and Advanced tabs, with separate desktop, tablet and phone settings, and hover states.
 * Backgrounds: colour, gradient, image (with focal point and parallax), video (YouTube or file) and slideshow, plus overlays, patterns and shape dividers.
 * Motion: entrance animations, staggered children, hover effects, looping effects and a typewriter heading.
@@ -47,6 +47,14 @@ Import the Panorama Retreat template: the full panoramaretreat.com.au website (1
 4. Edit any page: Foxi Studio opens automatically.
 
 == Changelog ==
+
+= 1.2.0 =
+* New Booking Widget (replaces the Booking Bar; existing bars keep working): 7 looks (Pill, Card, Glass, Boxed, Outline, Solid band, Minimal), quick colours, corner rounding and glass blur, plus full font, border, shadow and background control on the Style tab.
+* Layouts: bar, stacked (for a side column) or a single button that opens the form; phones can show stacked fields or just the button.
+* Placement: left, centre, right or full width; overlap the bottom of the hero; optional booking bar that stays at the bottom of the screen after scrolling.
+* Fields: arrival and departure or one date field, guests or adults and children (dropdown, pop-up counter or plus/minus), rooms and promo code. Every label and hint can be changed.
+* New calendar: two months side by side, selected stay highlighted with a nights count, minimum stay, keyboard friendly, and a slide-up panel on phones.
+* Booking engine settings are set once per site (Brand & business › Business details, or from the widget), with a SiteMinder preset and custom link details for any other engine.
 
 = 1.1.1 =
 * One-click updates: new versions now appear under Plugins with an "Update now" button, like plugins from wordpress.org.

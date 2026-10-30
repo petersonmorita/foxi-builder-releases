@@ -56,6 +56,7 @@ class Studio {
 			'canManage'    => current_user_can( 'manage_options' ),
 			'brand'        => Brand::get(),
 			'business'     => Brand::business(),
+			'bookingEngines' => BookingEngine::presets(),
 			'brandCss'     => Brand::css_vars(),
 			'fontsUrl'     => Brand::google_fonts_url(),
 			'settings'     => array(

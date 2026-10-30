@@ -299,40 +299,300 @@ class Form extends Base {
 class Booking extends Base {
 	const NAME = 'foxi/booking';
 
+	const LOOKS = array( 'bar', 'card', 'glass', 'boxed', 'outline', 'solid', 'minimal' );
+
 	protected static function markup( $a, $content, $block ) {
-		$labels = wp_parse_args( isset( $a['labels'] ) && is_array( $a['labels'] ) ? $a['labels'] : array(), array( 'arrival' => 'Arrival', 'departure' => 'Departure', 'guests' => 'Guests' ) );
+		$labels = wp_parse_args(
+			isset( $a['labels'] ) && is_array( $a['labels'] ) ? array_filter( $a['labels'], 'strlen' ) : array(),
+			array(
+				'arrival'   => __( 'Arrival', 'foxi-builder' ),
+				'departure' => __( 'Departure', 'foxi-builder' ),
+				'dates'     => __( 'Check-in – Check-out', 'foxi-builder' ),
+				'guests'    => __( 'Guests', 'foxi-builder' ),
+				'adults'    => __( 'Adults', 'foxi-builder' ),
+				'children'  => __( 'Children', 'foxi-builder' ),
+				'rooms'     => __( 'Rooms', 'foxi-builder' ),
+				'promo'     => __( 'Promo code', 'foxi-builder' ),
+			)
+		);
+		$ph     = wp_parse_args(
+			isset( $a['placeholders'] ) && is_array( $a['placeholders'] ) ? array_filter( $a['placeholders'], 'strlen' ) : array(),
+			array(
+				'date'  => __( 'Select date', 'foxi-builder' ),
+				'dates' => __( 'Add dates', 'foxi-builder' ),
+				'promo' => __( 'Enter code', 'foxi-builder' ),
+			)
+		);
 		$url    = \Foxi\Tokens::url( isset( $a['url'] ) ? $a['url'] : '' );
 		if ( ! $url ) {
 			$contact = get_page_by_path( 'contact' );
 			$url     = $contact ? get_permalink( $contact ) : home_url( '/' );
 		}
-		$uid   = \Foxi\Style::clean_id( foxi_get( $a, 'fx.id', 'b' ) );
-		$today = gmdate( 'Y-m-d' );
-		$icons = ! empty( $a['icons'] );
-		$field = static function ( $key, $label, $control ) use ( $uid, $icons ) {
-			$icon = '';
-			if ( $icons ) {
-				$icon = '<span class="fx-booking__icon" aria-hidden="true">' . foxi_icon( 'g' === $key ? 'lucide:users' : 'lucide:calendar-days' ) . '</span>';
-			}
-			return sprintf( '<div class="fx-booking__field%5$s">%6$s<div class="fx-booking__fieldbody"><label class="fx-booking__label" for="fx-bk-%1$s-%2$s">%3$s</label>%4$s</div></div>', esc_attr( $uid ), esc_attr( $key ), esc_html( $label ), $control, $icon ? ' has-icon' : '', $icon );
+		$engine = \Foxi\BookingEngine::resolve( $a );
+		$p      = $engine['params'];
+
+		$opt = static function ( $key, $allowed, $default ) use ( $a ) {
+			return isset( $a[ $key ] ) && in_array( $a[ $key ], $allowed, true ) ? $a[ $key ] : $default;
 		};
-		$html  = $field( 'a', $labels['arrival'], sprintf( '<input class="fx-booking__input" type="date" id="fx-bk-%1$s-a" name="%2$s" min="%3$s" required>', esc_attr( $uid ), esc_attr( isset( $a['arrivalParam'] ) ? $a['arrivalParam'] : 'arrival' ), esc_attr( $today ) ) );
-		$html .= $field( 'd', $labels['departure'], sprintf( '<input class="fx-booking__input" type="date" id="fx-bk-%1$s-d" name="%2$s" min="%3$s" required>', esc_attr( $uid ), esc_attr( isset( $a['departureParam'] ) ? $a['departureParam'] : 'departure' ), esc_attr( $today ) ) );
-		if ( ! empty( $a['showGuests'] ) ) {
-			$max  = max( 1, min( 30, (int) ( isset( $a['maxGuests'] ) ? $a['maxGuests'] : 6 ) ) );
-			$opts = '';
-			for ( $g = 1; $g <= $max; $g++ ) {
-				$text  = ! empty( $a['guestsWord'] ) ? sprintf( /* translators: %d number of guests */ _n( '%d Guest', '%d Guests', $g, 'foxi-builder' ), $g ) : (string) $g;
-				$opts .= '<option value="' . $g . '"' . ( 2 === $g ? ' selected' : '' ) . '>' . esc_html( $text ) . '</option>';
+		$look        = $opt( 'look', self::LOOKS, 'bar' );
+		$layout      = $opt( 'layout', array( 'bar', 'stacked', 'compact' ), 'bar' );
+		$mobile      = $opt( 'mobileLayout', array( 'stack', 'compact' ), 'stack' );
+		$align       = $opt( 'align', array( 'stretch', 'left', 'center', 'right' ), 'stretch' );
+		$fixed       = $opt( 'fixed', array( 'none', 'bottom', 'mobile' ), 'none' );
+		$dates       = $opt( 'dates', array( 'two', 'range', 'none' ), 'two' );
+		$guest_mode  = isset( $a['showGuests'] ) && ! $a['showGuests'] ? 'none' : $opt( 'guestMode', array( 'total', 'split', 'none' ), 'total' );
+		$guest_ui    = $opt( 'guestUI', array( 'select', 'popover', 'stepper' ), 'select' );
+		$label_style = $opt( 'labelStyle', array( 'above', 'hidden' ), 'above' );
+		$icon_style  = $opt( 'iconStyle', array( 'none', 'beside', 'inside' ), ! empty( $a['icons'] ) ? 'beside' : 'none' );
+		$display     = $opt( 'displayFormat', array( 'short', 'long', 'dmy', 'mdy', 'iso' ), 'short' );
+
+		$uid    = \Foxi\Style::clean_id( foxi_get( $a, 'fx.id', 'b' ) );
+		$today  = wp_date( 'Y-m-d' );
+		$hidden = 'hidden' === $label_style;
+		$icons  = array(
+			'arrival'   => 'lucide:calendar-days',
+			'departure' => 'lucide:calendar-days',
+			'dates'     => 'lucide:calendar-days',
+			'guests'    => 'lucide:users',
+			'adults'    => 'lucide:users',
+			'children'  => 'lucide:baby',
+			'rooms'     => 'lucide:bed-double',
+			'promo'     => 'lucide:tag',
+		);
+
+		/* One field: label + control, with the chosen icon placement. */
+		$field = static function ( $key, $control, $for = '' ) use ( $uid, $labels, $icons, $icon_style, $hidden ) {
+			$icon   = '<span class="fx-booking__icon" aria-hidden="true">' . foxi_icon( $icons[ $key ] ) . '</span>';
+			$for    = $for ? $for : "fx-bk-$uid-$key";
+			$label  = sprintf( '<label class="fx-booking__label%s" for="%s">%s</label>', $hidden ? ' fx-sr-only' : '', esc_attr( $for ), esc_html( $labels[ $key ] ) );
+			$inside = 'inside' === $icon_style ? $icon : '';
+			return sprintf(
+				'<div class="fx-booking__field fx-booking__field--%1$s%2$s">%3$s<div class="fx-booking__fieldbody">%4$s<div class="fx-booking__control">%5$s%6$s</div></div></div>',
+				esc_attr( $key ),
+				'beside' === $icon_style ? ' has-icon' : '',
+				'beside' === $icon_style ? $icon : '',
+				$label,
+				$control,
+				$inside
+			);
+		};
+		// Editor preview (no front-end script): draw the fields as visitors see them.
+		$preview    = defined( 'REST_REQUEST' ) && REST_REQUEST;
+		$fake       = static function ( $text ) {
+			return '<span class="fx-booking__input fx-booking__trigger"><span class="fx-booking__value is-empty">' . esc_html( $text ) . '</span></span>';
+		};
+		$date_input = static function ( $role, $param, $placeholder, $label ) use ( $uid, $today, $preview, $fake ) {
+			if ( $preview ) {
+				return $fake( $placeholder );
 			}
-			$html .= $field( 'g', $labels['guests'], sprintf( '<select class="fx-booking__input" id="fx-bk-%1$s-g" name="%2$s">%3$s</select>', esc_attr( $uid ), esc_attr( isset( $a['guestsParam'] ) ? $a['guestsParam'] : 'guests' ), $opts ) );
+			return sprintf(
+				'<input class="fx-booking__input fx-booking__date" type="date" id="fx-bk-%1$s-%2$s" name="%3$s" min="%4$s" data-role="%2$s" data-placeholder="%5$s" aria-label="%6$s" required>',
+				esc_attr( $uid ),
+				esc_attr( $role ),
+				esc_attr( $param ),
+				esc_attr( $today ),
+				esc_attr( $placeholder ),
+				esc_attr( $label )
+			);
+		};
+		/* A number of guests/rooms: dropdown or plus/minus. */
+		$count = static function ( $key, $param, $min, $max, $value ) use ( $uid, $guest_ui, $a ) {
+			$id = "fx-bk-$uid-$key";
+			if ( 'stepper' === $guest_ui ) {
+				return sprintf(
+					'<div class="fx-booking__stepper"><button type="button" class="fx-booking__step" data-step="-1" aria-label="%6$s">%8$s</button><input class="fx-booking__input fx-booking__num" type="number" id="%1$s" name="%2$s" min="%3$d" max="%4$d" value="%5$d" inputmode="numeric" data-role="%9$s"><button type="button" class="fx-booking__step" data-step="1" aria-label="%7$s">%10$s</button></div>',
+					esc_attr( $id ),
+					esc_attr( $param ),
+					$min,
+					$max,
+					$value,
+					esc_attr__( 'Fewer', 'foxi-builder' ),
+					esc_attr__( 'More', 'foxi-builder' ),
+					foxi_icon( 'lucide:minus' ),
+					esc_attr( $key ),
+					foxi_icon( 'lucide:plus' )
+				);
+			}
+			$opts = '';
+			for ( $n = $min; $n <= $max; $n++ ) {
+				$text = (string) $n;
+				if ( ! empty( $a['guestsWord'] ) ) {
+					$words = array(
+						/* translators: %d: number of guests */
+						'guests'   => _n( '%d Guest', '%d Guests', $n, 'foxi-builder' ),
+						/* translators: %d: number of adults */
+						'adults'   => _n( '%d Adult', '%d Adults', $n, 'foxi-builder' ),
+						/* translators: %d: number of children */
+						'children' => _n( '%d Child', '%d Children', $n, 'foxi-builder' ),
+						/* translators: %d: number of rooms */
+						'rooms'    => _n( '%d Room', '%d Rooms', $n, 'foxi-builder' ),
+					);
+					$text  = sprintf( $words[ $key ], $n );
+				}
+				$opts .= sprintf( '<option value="%1$d"%2$s>%3$s</option>', $n, selected( $n, $value, false ), esc_html( $text ) );
+			}
+			return sprintf( '<select class="fx-booking__input fx-booking__select" id="%1$s" name="%2$s" data-role="%3$s">%4$s</select>', esc_attr( $id ), esc_attr( $param ), esc_attr( $key ), $opts );
+		};
+
+		$max_guests   = max( 1, min( 30, (int) ( isset( $a['maxGuests'] ) ? $a['maxGuests'] : 6 ) ) );
+		$max_children = max( 0, min( 20, (int) ( isset( $a['maxChildren'] ) ? $a['maxChildren'] : 4 ) ) );
+		$max_rooms    = max( 1, min( 20, (int) ( isset( $a['maxRooms'] ) ? $a['maxRooms'] : 5 ) ) );
+		$default_g    = min( 2, $max_guests );
+
+		$html = '';
+		if ( 'two' === $dates ) {
+			$html .= $field( 'arrival', $date_input( 'arrival', $p['arrival'], $hidden ? $labels['arrival'] : $ph['date'], $labels['arrival'] ) );
+			$html .= $field( 'departure', $date_input( 'departure', $p['departure'], $hidden ? $labels['departure'] : $ph['date'], $labels['departure'] ) );
+		} elseif ( 'range' === $dates ) {
+			$placeholder = $hidden ? $labels['dates'] : $ph['dates'];
+			$html       .= $field(
+				'dates',
+				$preview ? $fake( $placeholder ) : '<div class="fx-booking__range">' . $date_input( 'arrival', $p['arrival'], $placeholder, $labels['arrival'] ) . '<span class="fx-booking__range-sep" aria-hidden="true">–</span>' . $date_input( 'departure', $p['departure'], $placeholder, $labels['departure'] ) . '</div>',
+				"fx-bk-$uid-arrival"
+			);
 		}
-		$btn_icon = ! empty( $a['buttonIcon'] ) ? '<span class="fx-button__icon" aria-hidden="true">' . foxi_icon( $a['buttonIcon'] ) . '</span>' : '';
-		$html    .= '<button type="submit" class="fx-booking__submit fx-button fx-button--primary fx-button--m"><span class="fx-button__text">' . esc_html( isset( $a['buttonText'] ) ? $a['buttonText'] : __( 'Check availability', 'foxi-builder' ) ) . '</span>' . $btn_icon . '</button>';
+
+		$counts = array();
+		if ( 'total' === $guest_mode ) {
+			$counts['guests'] = array( $p['guests'], 1, $max_guests, $default_g );
+		} elseif ( 'split' === $guest_mode ) {
+			$counts['adults']   = array( $p['adults'], 1, $max_guests, $default_g );
+			$counts['children'] = array( $p['children'], 0, $max_children, 0 );
+		}
+		if ( ! empty( $a['rooms'] ) && $p['rooms'] ) {
+			$counts['rooms'] = array( $p['rooms'], 1, $max_rooms, 1 );
+		}
+		if ( $counts ) {
+			if ( 'popover' === $guest_ui ) {
+				// One "Guests" field; the script turns the dropdowns into a pop-up counter.
+				$inner = '';
+				foreach ( $counts as $key => $c ) {
+					$inner .= $count( $key, $c[0], $c[1], $c[2], $c[3] );
+				}
+				if ( $preview ) {
+					$parts = array();
+					$words = array(
+						/* translators: %d: number */
+						'guests'   => _n( '%d Guest', '%d Guests', 2, 'foxi-builder' ),
+						/* translators: %d: number */
+						'adults'   => _n( '%d Adult', '%d Adults', 2, 'foxi-builder' ),
+						/* translators: %d: number */
+						'rooms'    => _n( '%d Room', '%d Rooms', 1, 'foxi-builder' ),
+					);
+					foreach ( $counts as $key => $c ) {
+						if ( isset( $words[ $key ] ) ) {
+							$parts[] = sprintf( $words[ $key ], $c[3] );
+						}
+					}
+					$inner = str_replace( 'is-empty', '', $fake( implode( ', ', $parts ) ) ) . '<div class="fx-booking__party" hidden>' . $inner . '</div>';
+				}
+				$first  = array_keys( $counts )[0];
+				$html  .= str_replace( 'fx-booking__field--guests', 'fx-booking__field--guests fx-booking__field--party', $field( 'guests', '<div class="fx-booking__party">' . $inner . '</div>', "fx-bk-$uid-$first" ) );
+			} else {
+				foreach ( $counts as $key => $c ) {
+					$html .= $field( $key, $count( $key, $c[0], $c[1], $c[2], $c[3] ) );
+				}
+			}
+		}
+		if ( ! empty( $a['promo'] ) && $p['promo'] ) {
+			$html .= $field( 'promo', sprintf( '<input class="fx-booking__input fx-booking__text" type="text" id="fx-bk-%1$s-promo" name="%2$s" placeholder="%3$s" autocomplete="off">', esc_attr( $uid ), esc_attr( $p['promo'] ), esc_attr( $hidden ? $labels['promo'] : $ph['promo'] ) ) );
+		}
+		if ( $p['nights'] && 'none' !== $dates ) {
+			$html .= sprintf( '<input type="hidden" name="%s" data-role="nights" value="">', esc_attr( $p['nights'] ) );
+		}
+
+		$button_text = isset( $a['buttonText'] ) && '' !== $a['buttonText'] ? $a['buttonText'] : __( 'Check availability', 'foxi-builder' );
+		$btn_icon    = ! empty( $a['buttonIcon'] ) ? '<span class="fx-button__icon" aria-hidden="true">' . foxi_icon( $a['buttonIcon'] ) . '</span>' : '';
+		$html       .= '<div class="fx-booking__actions"><button type="submit" class="fx-booking__submit fx-button fx-button--primary fx-button--m"><span class="fx-button__text">' . esc_html( $button_text ) . '</span>' . $btn_icon . '</button></div>';
+
+		$config = array(
+			'dateFormat' => $engine['dateFormat'],
+			'display'    => $display,
+			'minNights'  => max( 1, min( 60, (int) ( isset( $a['minNights'] ) ? $a['minNights'] : 1 ) ) ),
+			'prefill'    => ! empty( $a['prefillDates'] ),
+			'fixed'      => $fixed,
+			'guestUI'    => $guest_ui,
+			'words'      => ! empty( $a['guestsWord'] ),
+			'labels'     => $labels,
+			'i18n'       => array(
+				'clear'    => __( 'Clear', 'foxi-builder' ),
+				'done'     => __( 'Done', 'foxi-builder' ),
+				'close'    => __( 'Close', 'foxi-builder' ),
+				'prev'     => __( 'Previous month', 'foxi-builder' ),
+				'next'     => __( 'Next month', 'foxi-builder' ),
+				'arrival'  => __( 'Select your arrival date', 'foxi-builder' ),
+				'depart'   => __( 'Select your departure date', 'foxi-builder' ),
+				/* translators: %d: number of nights */
+				'night'    => _n( '%d night', '%d nights', 1, 'foxi-builder' ),
+				/* translators: %d: number of nights */
+				'nights'   => _n( '%d night', '%d nights', 2, 'foxi-builder' ),
+				/* translators: %d: minimum number of nights */
+				'minStay'  => __( 'Minimum stay: %d nights', 'foxi-builder' ),
+				'guests'   => array( _n( '%d Guest', '%d Guests', 1, 'foxi-builder' ), _n( '%d Guest', '%d Guests', 2, 'foxi-builder' ) ),
+				'adults'   => array( _n( '%d Adult', '%d Adults', 1, 'foxi-builder' ), _n( '%d Adult', '%d Adults', 2, 'foxi-builder' ) ),
+				'children' => array( _n( '%d Child', '%d Children', 1, 'foxi-builder' ), _n( '%d Child', '%d Children', 2, 'foxi-builder' ) ),
+				'rooms'    => array( _n( '%d Room', '%d Rooms', 1, 'foxi-builder' ), _n( '%d Room', '%d Rooms', 2, 'foxi-builder' ) ),
+				'adultsHint'   => __( 'Ages 13 and over', 'foxi-builder' ),
+				'childrenHint' => __( 'Ages 0 to 12', 'foxi-builder' ),
+			),
+		);
+
+		/* Quick colours, corners and glass blur become CSS variables. */
+		$vars   = array();
+		$colors = isset( $a['colors'] ) && is_array( $a['colors'] ) ? $a['colors'] : array();
+		$map    = array(
+			'panel'      => '--bk-panel',
+			'text'       => '--bk-text',
+			'label'      => '--bk-label',
+			'field'      => '--bk-field',
+			'fieldText'  => '--bk-field-text',
+			'border'     => '--bk-border',
+			'accent'     => '--bk-accent',
+			'accentText' => '--bk-accent-text',
+		);
+		foreach ( $map as $key => $var ) {
+			$c = isset( $colors[ $key ] ) ? preg_replace( '/[^#a-zA-Z0-9(),.%\-\s]/', '', (string) $colors[ $key ] ) : '';
+			if ( '' !== trim( $c ) ) {
+				$vars[] = $var . ':' . trim( $c );
+			}
+		}
+		if ( isset( $a['radius'] ) && '' !== (string) $a['radius'] ) {
+			$vars[] = '--bk-radius:' . max( 0, min( 999, (int) $a['radius'] ) ) . 'px';
+		}
+		if ( 'glass' === $look && isset( $a['blur'] ) ) {
+			$vars[] = '--bk-blur:' . max( 0, min( 60, (int) $a['blur'] ) ) . 'px';
+		}
+		$overlap = isset( $a['overlap'] ) ? max( 0, min( 400, (int) $a['overlap'] ) ) : 0;
+		if ( $overlap ) {
+			$vars[] = '--bk-overlap:' . $overlap . 'px';
+		}
+
+		$classes = array(
+			'fx-booking--look-' . $look,
+			'fx-booking--layout-' . $layout,
+			'fx-booking--m-' . $mobile,
+			'fx-booking--align-' . $align,
+			'fx-booking--icons-' . $icon_style,
+			$hidden ? 'fx-booking--labels-hidden' : '',
+			! empty( $a['dividers'] ) ? 'fx-booking--dividers' : '',
+			$overlap ? 'fx-booking--overlap' : '',
+			'none' !== $fixed ? 'fx-booking--fixable' : '',
+		);
+		$attrs   = array( 'data-fx-booking' => wp_json_encode( $config ) );
+		if ( $vars ) {
+			$attrs['style'] = implode( ';', $vars );
+		}
+
+		$open = sprintf(
+			'<button type="button" class="fx-booking__open fx-button fx-button--primary fx-button--m" aria-haspopup="dialog"><span class="fx-button__text">%1$s</span>%2$s</button>',
+			esc_html( $button_text ),
+			$btn_icon
+		);
 
 		return sprintf(
-			'<form %1$s action="%2$s" method="get"%3$s>%4$s</form>',
-			self::wrapper( $a, array_filter( array( $icons ? 'fx-booking--icons' : '', ! empty( $a['dividers'] ) ? 'fx-booking--dividers' : '' ) ), array_filter( array( 'data-fx-booking' => true, 'data-fx-prefill' => ! empty( $a['prefillDates'] ) ) ) ),
+			'<div %1$s>%2$s<form class="fx-booking__form" action="%3$s" method="get"%4$s>%5$s</form></div>',
+			self::wrapper( $a, array_filter( $classes ), $attrs ),
+			$open,
 			esc_url( $url ),
 			! empty( $a['newTab'] ) ? ' target="_blank"' : '',
 			$html

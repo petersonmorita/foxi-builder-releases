@@ -83,6 +83,7 @@ class Brand {
 			'country'     => '',
 			'hours'       => '',
 			'bookingUrl'  => '',
+			'booking'     => BookingEngine::defaults(),
 			'priceRange'  => '',
 			'logoId'      => 0,
 			'logoUrl'     => '',
@@ -187,6 +188,10 @@ class Brand {
 		$d     = self::business_defaults();
 		$clean = array();
 		foreach ( $d as $key => $default ) {
+			if ( 'booking' === $key ) {
+				$clean['booking'] = BookingEngine::sanitize( foxi_get( $input, 'booking', array() ) );
+				continue;
+			}
 			if ( 'socials' === $key ) {
 				foreach ( $default as $net => $_ ) {
 					$clean['socials'][ $net ] = esc_url_raw( (string) foxi_get( $input, "socials.$net", '' ) );

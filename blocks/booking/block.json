@@ -2,9 +2,9 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "foxi/booking",
-	"title": "Booking Bar",
+	"title": "Booking Widget",
 	"category": "foxi-interactive",
-	"description": "Arrival, departure and guests fields that send visitors to your booking engine.",
+	"description": "Dates, guests and a button that send visitors to your booking engine. Choose a look, layout and placement.",
 	"textdomain": "foxi-builder",
 	"keywords": [
 		"reservation",
@@ -23,15 +23,15 @@
 		},
 		"arrivalParam": {
 			"type": "string",
-			"default": "arrival"
+			"default": ""
 		},
 		"departureParam": {
 			"type": "string",
-			"default": "departure"
+			"default": ""
 		},
 		"guestsParam": {
 			"type": "string",
-			"default": "guests"
+			"default": ""
 		},
 		"maxGuests": {
 			"type": "number",
@@ -54,7 +54,12 @@
 			"default": {
 				"arrival": "Arrival",
 				"departure": "Departure",
-				"guests": "Guests"
+				"dates": "Check-in \u2013 Check-out",
+				"guests": "Guests",
+				"adults": "Adults",
+				"children": "Children",
+				"rooms": "Rooms",
+				"promo": "Promo code"
 			}
 		},
 		"icons": {
@@ -76,6 +81,114 @@
 		"prefillDates": {
 			"type": "boolean",
 			"default": false
+		},
+		"adultsParam": {
+			"type": "string",
+			"default": ""
+		},
+		"childrenParam": {
+			"type": "string",
+			"default": ""
+		},
+		"roomsParam": {
+			"type": "string",
+			"default": ""
+		},
+		"promoParam": {
+			"type": "string",
+			"default": ""
+		},
+		"nightsParam": {
+			"type": "string",
+			"default": ""
+		},
+		"look": {
+			"type": "string",
+			"default": "bar"
+		},
+		"layout": {
+			"type": "string",
+			"default": "bar"
+		},
+		"mobileLayout": {
+			"type": "string",
+			"default": "stack"
+		},
+		"align": {
+			"type": "string",
+			"default": "stretch"
+		},
+		"overlap": {
+			"type": "number",
+			"default": 0
+		},
+		"fixed": {
+			"type": "string",
+			"default": "none"
+		},
+		"dates": {
+			"type": "string",
+			"default": "two"
+		},
+		"displayFormat": {
+			"type": "string",
+			"default": "short"
+		},
+		"minNights": {
+			"type": "number",
+			"default": 1
+		},
+		"guestMode": {
+			"type": "string",
+			"default": "total"
+		},
+		"guestUI": {
+			"type": "string",
+			"default": "select"
+		},
+		"maxChildren": {
+			"type": "number",
+			"default": 4
+		},
+		"rooms": {
+			"type": "boolean",
+			"default": false
+		},
+		"maxRooms": {
+			"type": "number",
+			"default": 5
+		},
+		"promo": {
+			"type": "boolean",
+			"default": false
+		},
+		"labelStyle": {
+			"type": "string",
+			"default": "above"
+		},
+		"iconStyle": {
+			"type": "string",
+			"default": ""
+		},
+		"colors": {
+			"type": "object",
+			"default": {}
+		},
+		"radius": {
+			"type": "string",
+			"default": ""
+		},
+		"blur": {
+			"type": "number",
+			"default": 16
+		},
+		"placeholders": {
+			"type": "object",
+			"default": {
+				"date": "Select date",
+				"dates": "Add dates",
+				"promo": "Enter code"
+			}
 		}
 	},
 	"supports": {
@@ -91,7 +204,9 @@
 			"input": "& .fx-booking__input",
 			"submit": "& .fx-booking__submit",
 			"icon": "& .fx-booking__icon",
-			"divider": "& .fx-booking__field + .fx-booking__field"
+			"divider": "& .fx-booking__field + .fx-booking__field",
+			"pop": "& .fx-booking__pop",
+			"open": "& .fx-booking__open"
 		}
 	}
 }
