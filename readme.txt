@@ -4,7 +4,7 @@ Tags: page builder, visual editor, blocks, seo, starter sites
 Requires at least: 6.6
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.2.0
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -15,7 +15,7 @@ A visual page builder for WordPress: click-to-edit pages, a Brand Kit that re-th
 Foxi Builder adds Foxi Studio to the WordPress editor: a side rail of tools around a live, full-width view of your page.
 
 = Build =
-* 40+ blocks: sections, columns, headings, text, buttons, icons, icon lists, images, galleries, video, maps, sliders, carousels, accordions/FAQ, tabs, counters, star ratings, flip boxes, contact forms, booking widget, posts, breadcrumbs, search, page title and more.
+* 40+ blocks: sections, columns, headings, text, buttons, icons, icon lists, images, galleries, video, maps, sliders, carousels, accordions/FAQ, tabs, counters, star ratings, flip boxes, contact forms, booking widget, Google reviews, posts, breadcrumbs, search, page title and more.
 * Every block has Content, Style, Motion and Advanced tabs, with separate desktop, tablet and phone settings, and hover states.
 * Backgrounds: colour, gradient, image (with focal point and parallax), video (YouTube or file) and slideshow, plus overlays, patterns and shape dividers.
 * Motion: entrance animations, staggered children, hover effects, looping effects and a typewriter heading.
@@ -47,6 +47,14 @@ Import the Panorama Retreat template: the full panoramaretreat.com.au website (1
 4. Edit any page: Foxi Studio opens automatically.
 
 == Changelog ==
+
+= 1.3.0 =
+* New Google Reviews block: your Google rating and reviews, refreshed automatically (once a day by default) through the Google Places API.
+* Six designs: carousel, grid, masonry wall, spotlight quote, list and rating badge, with quick colours and full styling.
+* Filters: minimum stars, only reviews with comments, shortest comment, order (Google's, newest, highest), how many to show, and hide any review.
+* Each review links to the reviewer and to the review on Google; overall rating with "Write a review" button.
+* Foxi › Settings › Google: add your API key and find your listing by name. A block can use a different listing.
+* The Panorama template's "What Our Guests Say" sections now show live Google reviews.
 
 = 1.2.0 =
 * New Booking Widget (replaces the Booking Bar; existing bars keep working): 7 looks (Pill, Card, Glass, Boxed, Outline, Solid band, Minimal), quick colours, corner rounding and glass blur, plus full font, border, shadow and background control on the Style tab.

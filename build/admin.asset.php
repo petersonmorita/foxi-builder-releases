@@ -8,5 +8,5 @@
 		'wp-i18n',
 		'wp-media-utils'
 	),
-	'version' => '559aa8d17af360413640'
+	'version' => '7724898cd19cdd6d14ea'
 );

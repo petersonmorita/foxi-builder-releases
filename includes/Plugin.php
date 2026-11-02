@@ -49,6 +49,7 @@ final class Plugin {
 			'studio'   => Studio::class,
 			'admin'    => Admin::class,
 			'updater'  => Updater::class,
+			'reviews'  => Reviews::class,
 		);
 
 		/**

@@ -45,6 +45,10 @@ class Settings {
 			'notFoundId'       => 0,
 			'breakpointTablet' => 1024,
 			'breakpointMobile' => 767,
+			'googleApiKey'     => '',
+			'googlePlaceId'    => '',
+			'googlePlaceName'  => '',
+			'reviewsCacheHours' => 24,
 		);
 	}
 

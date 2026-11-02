@@ -1,0 +1,139 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "foxi/reviews",
+	"title": "Google Reviews",
+	"category": "foxi-interactive",
+	"description": "Your latest Google reviews, kept up to date automatically. Pick a design and filter by stars or text.",
+	"textdomain": "foxi-builder",
+	"keywords": [
+		"reviews",
+		"testimonials",
+		"google",
+		"rating",
+		"stars"
+	],
+	"attributes": {
+		"fx": {
+			"type": "object",
+			"default": {}
+		},
+		"placeId": {
+			"type": "string",
+			"default": ""
+		},
+		"design": {
+			"type": "string",
+			"default": "carousel"
+		},
+		"minRating": {
+			"type": "number",
+			"default": 0
+		},
+		"withText": {
+			"type": "boolean",
+			"default": true
+		},
+		"minLength": {
+			"type": "number",
+			"default": 0
+		},
+		"sort": {
+			"type": "string",
+			"default": "relevance"
+		},
+		"limit": {
+			"type": "number",
+			"default": 5
+		},
+		"hidden": {
+			"type": "array",
+			"default": []
+		},
+		"summary": {
+			"type": "boolean",
+			"default": true
+		},
+		"writeButton": {
+			"type": "boolean",
+			"default": true
+		},
+		"writeText": {
+			"type": "string",
+			"default": "Write a review"
+		},
+		"showAvatar": {
+			"type": "boolean",
+			"default": true
+		},
+		"dateStyle": {
+			"type": "string",
+			"default": "relative"
+		},
+		"googleMark": {
+			"type": "boolean",
+			"default": true
+		},
+		"maxLines": {
+			"type": "number",
+			"default": 5
+		},
+		"perView": {
+			"type": "object",
+			"default": {
+				"desktop": 3,
+				"tablet": 2,
+				"mobile": 1
+			}
+		},
+		"gap": {
+			"type": "number",
+			"default": 24
+		},
+		"autoplay": {
+			"type": "boolean",
+			"default": true
+		},
+		"delay": {
+			"type": "number",
+			"default": 6000
+		},
+		"arrows": {
+			"type": "boolean",
+			"default": true
+		},
+		"dots": {
+			"type": "boolean",
+			"default": true
+		},
+		"align": {
+			"type": "string",
+			"default": "left"
+		},
+		"colors": {
+			"type": "object",
+			"default": {}
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"customClassName": true
+	},
+	"style": "foxi-blocks",
+	"foxi": {
+		"elements": {
+			"card": "& .fx-review",
+			"name": "& .fx-review__name",
+			"text": "& .fx-review__text",
+			"stars": "& .fx-review .fx-stars",
+			"date": "& .fx-review__date",
+			"avatar": "& .fx-review__avatar",
+			"summary": "& .fx-reviews__summary",
+			"score": "& .fx-reviews__score",
+			"button": "& .fx-reviews__write",
+			"badge": "& .fx-reviews__badge",
+			"note": "& .fx-reviews__note"
+		}
+	}
+}
