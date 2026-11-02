@@ -49,6 +49,8 @@ class Settings {
 			'googlePlaceId'    => '',
 			'googlePlaceName'  => '',
 			'reviewsCacheHours' => 24,
+			// Eased mouse-wheel scrolling on the front end (off, subtle, medium, strong).
+			'smoothScroll'     => 'off',
 		);
 	}
 

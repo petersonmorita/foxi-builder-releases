@@ -60,6 +60,14 @@ class Assets {
 		if ( $fonts ) {
 			wp_register_style( 'foxi-fonts', $fonts, array(), null ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
 		}
+
+		// Smooth scrolling: only loaded when switched on, and never inside the editor.
+		$smooth = Settings::get()['smoothScroll'];
+		if ( in_array( $smooth, array( 'subtle', 'medium', 'strong' ), true ) && ! is_admin() && ! is_customize_preview() && ! isset( $_GET['foxi-preview'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+			$asset = self::asset( 'smooth' );
+			wp_enqueue_script( 'foxi-smooth', FOXI_URL . 'build/smooth.js', array(), $asset['version'], array( 'in_footer' => true, 'strategy' => 'defer' ) );
+			wp_add_inline_script( 'foxi-smooth', 'window.foxiSmooth=' . wp_json_encode( array( 'feel' => $smooth ) ) . ';', 'before' );
+		}
 	}
 
 	public function js_flag() {
