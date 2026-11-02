@@ -4,7 +4,7 @@ Tags: page builder, visual editor, blocks, seo, starter sites
 Requires at least: 6.6
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.4.0
+Stable tag: 1.4.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,6 +47,10 @@ Import the Panorama Retreat template: the full panoramaretreat.com.au website (1
 4. Edit any page: Foxi Studio opens automatically.
 
 == Changelog ==
+
+= 1.4.1 =
+* Text sizes now use rem instead of px, so they follow each visitor's browser text-size setting. Page designs look the same at the normal setting.
+* Large text sizes set in the Style tab now shrink smoothly on tablets and phones unless you've set a tablet or phone size yourself. Brand Kit sizes, section spacing and side margins were already fluid and now use rem too.
 
 = 1.4.0 =
 * New Foxi › Forms: build any number of forms (contact, accommodation and event enquiries, or start blank) and use them on any page with the Contact Form block.

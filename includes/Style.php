@@ -108,10 +108,14 @@ class Style {
 						if ( ! isset( self::STATES[ $state ] ) || ! is_array( $decls ) ) {
 							continue;
 						}
-						$body = '';
+						$own_small = ! empty( $by_device['tablet'][ $state ]['font-size'] ) || ! empty( $by_device['mobile'][ $state ]['font-size'] );
+						$body      = '';
 						foreach ( $decls as $prop => $value ) {
 							$prop  = self::sanitize_prop( $prop );
 							$value = self::sanitize_value( $value );
+							if ( 'font-size' === $prop ) {
+								$value = self::font_size( $value, $device, $own_small );
+							}
 							if ( $prop && '' !== $value ) {
 								$body .= $prop . ':' . $value . ';';
 							}
@@ -139,6 +143,22 @@ class Style {
 			$css .= str_replace( 'selector', '.fx-' . $id, foxi_esc_css( $custom ) );
 		}
 		return $css;
+	}
+
+	/**
+	 * Text sizes set in px become rem (so they follow the visitor's browser
+	 * text size). Large desktop sizes with no tablet or phone size of their
+	 * own also shrink smoothly on smaller screens.
+	 */
+	public static function font_size( $value, $device, $own_small ) {
+		if ( ! preg_match( '/^(\d+(?:\.\d+)?)px$/', trim( (string) $value ), $m ) ) {
+			return $value;
+		}
+		$px = (float) $m[1];
+		if ( 'desktop' === $device && ! $own_small && $px > 18 ) {
+			return Brand::fluid_css( round( 18 + ( $px - 18 ) * 0.45, 2 ), $px );
+		}
+		return round( $px / 16, 4 ) . 'rem';
 	}
 
 	/**

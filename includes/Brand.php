@@ -282,12 +282,23 @@ class Brand {
 	private static function fluid( $min, $max ) {
 		$min = round( $min, 2 );
 		$max = round( $max, 2 );
+		return self::fluid_css( $min, $max );
+	}
+
+	/**
+	 * clamp() in rem (so it follows the visitor's browser text size) that
+	 * grows from $min px on a 375px phone to $max px on a 1280px screen.
+	 */
+	public static function fluid_css( $min, $max ) {
+		$rem = static function ( $px ) {
+			return round( $px / 16, 4 ) . 'rem';
+		};
 		if ( abs( $max - $min ) < 0.5 ) {
-			return $max . 'px';
+			return $rem( $max );
 		}
 		$slope = ( $max - $min ) / ( 1280 - 375 );
 		$inter = $min - $slope * 375;
-		return sprintf( 'clamp(%spx, %spx + %svw, %spx)', $min, round( $inter, 2 ), round( $slope * 100, 3 ), $max );
+		return sprintf( 'clamp(%s, %s + %svw, %s)', $rem( $min ), $rem( $inter ), round( $slope * 100, 3 ), $rem( $max ) );
 	}
 
 	/**
