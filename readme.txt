@@ -4,7 +4,7 @@ Tags: page builder, visual editor, blocks, seo, starter sites
 Requires at least: 6.6
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.5.0
+Stable tag: 1.6.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,6 +47,9 @@ Import the Panorama Retreat template: the full panoramaretreat.com.au website (1
 4. Edit any page: Foxi Studio opens automatically.
 
 == Changelog ==
+
+= 1.6.0 =
+* New custom scrollbar (Foxi › Settings › Scrollbar): Standard, Rounded, Floating, Gradient, Square or Minimal, in thin, regular or wide, with your own bar, track and gradient colours (brand colours follow your Brand Kit). Each style has a live preview.
 
 = 1.5.0 =
 * New smooth scrolling (Foxi › Settings › Smooth scrolling: Subtle, Medium or Strong). Mouse-wheel and trackpad scrolling glides and eases to a stop. Phones keep their own scrolling, visitors who prefer reduced motion get normal scrolling, and pop-ups, menus and the lightbox are left alone. It's only loaded when switched on.

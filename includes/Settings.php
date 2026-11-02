@@ -51,6 +51,12 @@ class Settings {
 			'reviewsCacheHours' => 24,
 			// Eased mouse-wheel scrolling on the front end (off, subtle, medium, strong).
 			'smoothScroll'     => 'off',
+			// Page scrollbar: default (browser), rounded, floating, square, gradient or minimal.
+			'scrollbar'        => 'default',
+			'scrollbarWidth'   => 'regular',
+			'scrollbarThumb'   => '',
+			'scrollbarThumb2'  => '',
+			'scrollbarTrack'   => '',
 		);
 	}
 

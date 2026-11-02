@@ -50,6 +50,7 @@ final class Plugin {
 			'admin'    => Admin::class,
 			'updater'  => Updater::class,
 			'reviews'  => Reviews::class,
+			'scrollbar' => Scrollbar::class,
 		);
 
 		/**
