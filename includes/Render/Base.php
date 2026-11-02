@@ -265,11 +265,14 @@ abstract class Base {
 			$attrs = array_merge(
 				array(
 					'class'   => $class,
-					'alt'     => $alt,
 					'loading' => isset( $extra['loading'] ) ? $extra['loading'] : 'lazy',
 				),
 				$extra
 			);
+			// Alt text typed on the block wins; otherwise use the one saved in the Media Library.
+			if ( '' !== trim( $alt ) ) {
+				$attrs['alt'] = $alt;
+			}
 			$html = wp_get_attachment_image( (int) $image['id'], $size, false, $attrs );
 			if ( $html ) {
 				return $html;

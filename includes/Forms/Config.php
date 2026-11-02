@@ -169,7 +169,7 @@ class Config {
 		return hash( 'sha256', wp_salt( 'auth' ) . 'foxi-forms', true );
 	}
 
-	private static function encrypt( $plain ) {
+	public static function encrypt( $plain ) {
 		if ( '' === (string) $plain ) {
 			return '';
 		}
@@ -183,7 +183,7 @@ class Config {
 		return 'fx0:' . base64_encode( (string) $plain ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
 	}
 
-	private static function decrypt( $stored ) {
+	public static function decrypt( $stored ) {
 		$stored = (string) $stored;
 		if ( 0 === strpos( $stored, 'fx1:' ) && function_exists( 'openssl_decrypt' ) ) {
 			$raw   = base64_decode( substr( $stored, 4 ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode

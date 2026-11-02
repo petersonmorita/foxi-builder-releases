@@ -11,8 +11,9 @@
 		'wp-element',
 		'wp-i18n',
 		'wp-media-utils',
+		'wp-notices',
 		'wp-plugins',
 		'wp-server-side-render'
 	),
-	'version' => 'bf66f84c2cfd5fe933ab'
+	'version' => '4131613c378686e2ebdc'
 );

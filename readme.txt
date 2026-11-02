@@ -4,7 +4,7 @@ Tags: page builder, visual editor, blocks, seo, starter sites
 Requires at least: 6.6
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.6.0
+Stable tag: 1.7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,6 +47,13 @@ Import the Panorama Retreat template: the full panoramaretreat.com.au website (1
 4. Edit any page: Foxi Studio opens automatically.
 
 == Changelog ==
+
+= 1.7.0 =
+* New Social Feed block: your latest Instagram and/or Facebook Page posts, updated automatically, in six designs (grid with captions on hover, cards, carousel, collage, masonry and a full-width strip), with an optional @name and follow button. Posts can also be added by hand, e.g. for LinkedIn. Connect accounts in Foxi › Settings › Social media; the Instagram connection renews itself.
+* Insights: colour-contrast problems now list each piece of text with its real colours and offer one-click fixes: the closest colour that passes, a stronger one, or the nearest passing Brand Kit colour. Mark anything you're happy with as fine and it stops counting. Every check has an "i" button explaining what it means and why it matters.
+* Pages, posts and headers/footers now need a name before they can be saved or published, so the page address isn't left as a number.
+* Images use the alt text from the Media Library when the block's own alt text is empty, and swapping an image no longer keeps the old picture's alt text.
+* Fixed the Google Reviews spotlight quote sitting left of centre between the arrows.
 
 = 1.6.0 =
 * New custom scrollbar (Foxi › Settings › Scrollbar): Standard, Rounded, Floating, Gradient, Square or Minimal, in thin, regular or wide, with your own bar, track and gradient colours (brand colours follow your Brand Kit). Each style has a live preview.

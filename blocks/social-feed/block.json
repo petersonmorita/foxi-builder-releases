@@ -1,0 +1,43 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "foxi/social-feed",
+	"title": "Social Feed",
+	"category": "foxi-interactive",
+	"description": "Your latest Instagram or Facebook posts, kept up to date automatically, or posts you add yourself (e.g. LinkedIn).",
+	"textdomain": "foxi-builder",
+	"keywords": [ "instagram", "facebook", "linkedin", "social", "feed", "posts" ],
+	"attributes": {
+		"fx": { "type": "object", "default": {} },
+		"source": { "type": "string", "default": "instagram" },
+		"manual": { "type": "array", "default": [] },
+		"design": { "type": "string", "default": "grid" },
+		"limit": { "type": "number", "default": 6 },
+		"columns": { "type": "object", "default": { "desktop": 3, "tablet": 3, "mobile": 2 } },
+		"gap": { "type": "number", "default": 8 },
+		"ratio": { "type": "string", "default": "square" },
+		"hover": { "type": "string", "default": "caption" },
+		"captionLines": { "type": "number", "default": 4 },
+		"showDate": { "type": "boolean", "default": true },
+		"showIcon": { "type": "boolean", "default": true },
+		"header": { "type": "boolean", "default": false },
+		"headerText": { "type": "string", "default": "" },
+		"followText": { "type": "string", "default": "Follow us" },
+		"followUrl": { "type": "string", "default": "" },
+		"autoplay": { "type": "boolean", "default": false },
+		"arrows": { "type": "boolean", "default": true },
+		"colors": { "type": "object", "default": {} }
+	},
+	"supports": { "html": false, "anchor": true, "customClassName": true },
+	"style": "foxi-blocks",
+	"foxi": {
+		"elements": {
+			"tile": "& .fx-social__item",
+			"overlay": "& .fx-social__overlay",
+			"caption": "& .fx-social__caption",
+			"card": "& .fx-social__card",
+			"head": "& .fx-social__head",
+			"button": "& .fx-social__follow"
+		}
+	}
+}
