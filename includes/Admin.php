@@ -15,6 +15,7 @@ class Admin {
 		'foxi'          => 'home',
 		'foxi-starters' => 'starters',
 		'foxi-brand'    => 'brand',
+		'foxi-forms'    => 'forms',
 		'foxi-seo'      => 'seo',
 		'foxi-settings' => 'settings',
 	);
@@ -39,9 +40,25 @@ class Admin {
 		add_submenu_page( 'foxi', __( 'Starter sites', 'foxi-builder' ), __( 'Starter sites', 'foxi-builder' ), 'manage_options', 'foxi-starters', $render );
 		add_submenu_page( 'foxi', __( 'Brand Kit', 'foxi-builder' ), __( 'Brand & business', 'foxi-builder' ), 'manage_options', 'foxi-brand', $render );
 		add_submenu_page( 'foxi', __( 'Headers & Footers', 'foxi-builder' ), __( 'Headers & footers', 'foxi-builder' ), 'edit_pages', 'edit.php?post_type=' . Parts::POST_TYPE );
-		add_submenu_page( 'foxi', __( 'Messages', 'foxi-builder' ), __( 'Messages', 'foxi-builder' ), 'edit_pages', 'edit.php?post_type=' . Forms::POST_TYPE );
+		$unread = self::unread();
+		add_submenu_page( 'foxi', __( 'Forms', 'foxi-builder' ), __( 'Forms', 'foxi-builder' ) . ( $unread ? ' <span class="awaiting-mod">' . number_format_i18n( $unread ) . '</span>' : '' ), 'edit_pages', 'foxi-forms', $render );
 		add_submenu_page( 'foxi', __( 'SEO', 'foxi-builder' ), __( 'SEO', 'foxi-builder' ), 'manage_options', 'foxi-seo', $render );
 		add_submenu_page( 'foxi', __( 'Settings', 'foxi-builder' ), __( 'Settings', 'foxi-builder' ), 'manage_options', 'foxi-settings', $render );
+	}
+
+	/** Unread form entries, for the menu badge. */
+	public static function unread() {
+		$q = new \WP_Query(
+			array(
+				'post_type'      => Forms::POST_TYPE,
+				'post_status'    => 'private',
+				'posts_per_page' => 1,
+				'fields'         => 'ids',
+				'no_found_rows'  => false,
+				'meta_query'     => array( array( 'key' => '_foxi_read', 'compare' => 'NOT EXISTS' ) ), // phpcs:ignore WordPress.DB.SlowDBQuery
+			)
+		);
+		return (int) $q->found_posts;
 	}
 
 	public function page() {
@@ -74,11 +91,21 @@ class Admin {
 			'404'     => Parts::list_parts( '404' ),
 		);
 		$data['partsUrl']     = admin_url( 'edit.php?post_type=' . Parts::POST_TYPE );
-		$data['messagesUrl']  = admin_url( 'edit.php?post_type=' . Forms::POST_TYPE );
+		$data['messagesUrl']  = admin_url( 'admin.php?page=foxi-forms&tab=entries' );
+		$data['formsUrl']     = admin_url( 'admin.php?page=foxi-forms' );
+		$data['canManage']    = current_user_can( 'manage_options' );
+		$data['adminEmail']   = wp_get_current_user()->user_email;
+		$data['siteName']     = wp_specialchars_decode( get_bloginfo( 'name' ), ENT_QUOTES );
+		$data['pages']        = array_map(
+			static function ( $p ) {
+				return array( 'id' => $p->ID, 'title' => $p->post_title );
+			},
+			get_pages( array( 'post_status' => 'publish' ) )
+		);
 		$data['newPageUrl']   = admin_url( 'post-new.php?post_type=page' );
 		$data['pagesUrl']     = admin_url( 'edit.php?post_type=page' );
 		$data['allSettings']  = Settings::get();
-		$data['messageCount'] = (int) wp_count_posts( Forms::POST_TYPE )->private;
+		$data['messageCount'] = self::unread();
 		$data['recentPages']  = array_map(
 			static function ( $p ) {
 				return array(

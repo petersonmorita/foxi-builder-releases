@@ -29,6 +29,14 @@
 			"type": "string",
 			"default": "auto"
 		},
+		"customWidth": {
+			"type": "string",
+			"default": "80%"
+		},
+		"customHeight": {
+			"type": "string",
+			"default": "60vh"
+		},
 		"vAlign": {
 			"type": "string",
 			"default": "center"

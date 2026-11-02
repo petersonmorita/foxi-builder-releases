@@ -4,7 +4,7 @@
 	"name": "foxi/form",
 	"title": "Contact Form",
 	"category": "foxi-interactive",
-	"description": "A contact form. Messages are emailed to you and saved under Foxi > Messages.",
+	"description": "Shows a form from Foxi › Forms. Entries are emailed and saved under Foxi › Forms › Entries.",
 	"textdomain": "foxi-builder",
 	"keywords": [
 		"contact",
@@ -15,6 +15,10 @@
 		"fx": {
 			"type": "object",
 			"default": {}
+		},
+		"formId": {
+			"type": "number",
+			"default": 0
 		},
 		"fields": {
 			"type": "array",
@@ -81,7 +85,11 @@
 			"field": "& .fx-form__field",
 			"label": "& .fx-form__label",
 			"input": "& .fx-form__input",
-			"submit": "& .fx-form__submit"
+			"submit": "& .fx-form__submit, & .fx-form__next",
+			"help": "& .fx-form__help",
+			"choice": "& .fx-form__choice",
+			"heading": "& .fx-form__heading",
+			"progress": "& .fx-form__progress"
 		}
 	}
 }

@@ -41,6 +41,13 @@ class Assets {
 				'rest'  => esc_url_raw( rest_url( 'foxi/v1/' ) ),
 				'i18n'  => array(
 					'sending' => __( 'Sending…', 'foxi-builder' ),
+					'required' => __( 'This field is required.', 'foxi-builder' ),
+					'pickOne' => __( 'Choose at least one option.', 'foxi-builder' ),
+					'tooBig'  => __( 'Files must be smaller than %d MB.', 'foxi-builder' ),
+					'tooMany' => __( 'You can add up to %d files.', 'foxi-builder' ),
+					'stepOf'  => __( 'Step %1$d of %2$d', 'foxi-builder' ),
+					'fix'     => __( 'Please check the highlighted fields.', 'foxi-builder' ),
+					'captchaFail' => __( 'The spam check didn’t load. Check your connection and try again.', 'foxi-builder' ),
 					'error'   => __( 'Your message could not be sent. Please check the highlighted fields and try again.', 'foxi-builder' ),
 					'close'   => __( 'Close', 'foxi-builder' ),
 					'next'    => __( 'Next image', 'foxi-builder' ),

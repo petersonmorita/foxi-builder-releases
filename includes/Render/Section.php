@@ -23,14 +23,27 @@ class Section extends Base {
 		if ( ! empty( $a['fx']['bg']['parallax'] ) ) {
 			$cls[] = 'fx-parallax';
 		}
+		$vars = array();
+		if ( 'custom' === foxi_get( $a, 'width' ) && self::css_size( foxi_get( $a, 'customWidth' ) ) ) {
+			$vars[] = '--fx-sec-w:' . self::css_size( $a['customWidth'] );
+		}
+		if ( 'custom' === foxi_get( $a, 'height' ) && self::css_size( foxi_get( $a, 'customHeight' ) ) ) {
+			$vars[] = '--fx-sec-h:' . self::css_size( $a['customHeight'] );
+		}
 		return sprintf(
 			'<%1$s %2$s>%3$s%4$s<div class="fx-section__inner">%5$s</div></%1$s>',
 			$tag,
-			self::wrapper( $a, $cls ),
+			self::wrapper( $a, $cls, $vars ? array( 'style' => implode( ';', $vars ) ) : array() ),
 			self::background( $a ),
 			self::shapes( $a ),
 			$content
 		);
+	}
+
+	/** A single CSS length ("55%", "900px", "60vh"), or '' if it isn't one. */
+	private static function css_size( $v ) {
+		$v = trim( (string) $v );
+		return preg_match( '/^\d+(\.\d+)?(px|%|vw|vh|svh|em|rem)$/', $v ) ? $v : '';
 	}
 }
 

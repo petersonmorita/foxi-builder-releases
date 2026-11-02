@@ -4,7 +4,7 @@ Tags: page builder, visual editor, blocks, seo, starter sites
 Requires at least: 6.6
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.3.0
+Stable tag: 1.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,6 +47,23 @@ Import the Panorama Retreat template: the full panoramaretreat.com.au website (1
 4. Edit any page: Foxi Studio opens automatically.
 
 == Changelog ==
+
+= 1.4.0 =
+* New Foxi › Forms: build any number of forms (contact, accommodation and event enquiries, or start blank) and use them on any page with the Contact Form block.
+* 16 field types: short and long text, name, email, phone, number, website, dropdown, pick one, pick several, agreement tick box, date, time, file upload, hidden value, headings and text blocks, plus multi-page forms with a progress bar.
+* Show or hide fields (and whole pages) based on earlier answers; field widths, help text, default values (including from the page address) and custom error messages.
+* Emails: as many as you like per form, each with its own recipients, CC/BCC, reply-to, subject and message using answers from the form, rules for when to send, and uploaded files attached.
+* After sending: show a message, go to a thank-you page or to any web address.
+* Entries: read, star, search, mark unread, delete and export to CSV, with a record of each email sent or why it failed. Unread count in the Foxi menu.
+* Email delivery through Gmail, Microsoft 365 or any SMTP server, with a test email button. Passwords are stored encrypted.
+* Spam protection: hidden traps, per-person limits, link and word blocking, plus reCAPTCHA v3, reCAPTCHA tick box, Cloudflare Turnstile or hCaptcha.
+* Per-form limits, opening dates and logged-in-only forms; automatic deletion of old entries.
+* Existing Contact Form blocks keep working and can be moved into Foxi › Forms with one click. The Panorama template now creates its forms in Foxi › Forms.
+* Sections: new "Edge to edge" width with no side spacing (the old option is now called "Full width"), plus custom width and height.
+* The Panorama offers section now runs edge to edge.
+* Google Reviews: the "Reviews from Google · …" line is now off by default (switch "Say how reviews are picked" on to show it). The editor no longer shows carousel arrows when every review already fits, matching the live site.
+* Fixed the spacing controls spilling out of the sidebar when editing each side separately.
+* Fixed the sticky header flickering when the page is scrolled only slightly.
 
 = 1.3.0 =
 * New Google Reviews block: your Google rating and reviews, refreshed automatically (once a day by default) through the Google Places API.

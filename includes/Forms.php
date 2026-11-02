@@ -16,6 +16,13 @@ class Forms {
 
 	public function init() {
 		add_action( 'init', array( $this, 'register_post_types' ) );
+		add_action( 'init', array( Forms\Store::class, 'register' ) );
+		add_action( 'rest_api_init', array( Forms\Rest::class, 'register' ) );
+		Forms\Mail::init();
+		add_action( 'foxi_forms_daily', array( Forms\Entries::class, 'prune' ) );
+		if ( ! wp_next_scheduled( 'foxi_forms_daily' ) ) {
+			wp_schedule_event( time() + HOUR_IN_SECONDS, 'daily', 'foxi_forms_daily' );
+		}
 		add_filter( 'manage_' . self::POST_TYPE . '_posts_columns', array( $this, 'columns' ) );
 		add_action( 'manage_' . self::POST_TYPE . '_posts_custom_column', array( $this, 'column' ), 10, 2 );
 		add_action( 'add_meta_boxes_' . self::POST_TYPE, array( $this, 'meta_box' ) );

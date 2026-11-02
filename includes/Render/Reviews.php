@@ -104,7 +104,7 @@ class Reviews extends SwiperBase {
 			wp_enqueue_style( 'foxi-swiper' );
 			$body = sprintf(
 				'<div class="fx-carousel fx-reviews__track%1$s" data-fx-swiper="%2$s" style="--fx-pv:%3$s;--fx-pv-t:%4$s;--fx-pv-m:%5$s;--fx-cgap:%6$dpx;--fx-cgap-t:%6$dpx;--fx-cgap-m:%7$dpx"><div class="swiper"><div class="swiper-wrapper">%8$s</div></div>%9$s%10$s</div>',
-				'spotlight' === $design ? ' fx-reviews__track--spotlight' : '',
+				( 'spotlight' === $design ? ' fx-reviews__track--spotlight' : '' ) . ( count( $list ) <= $d ? ' fx-reviews__track--fits' : '' ),
 				esc_attr( wp_json_encode( $opts ) ),
 				$d,
 				$t,
@@ -137,12 +137,12 @@ class Reviews extends SwiperBase {
 		}
 
 		return sprintf(
-			'<div %1$s>%2$s%3$s%4$s<p class="fx-reviews__note">%5$s</p></div>',
+			'<div %1$s>%2$s%3$s%4$s%5$s</div>',
 			self::wrapper( $a, array( 'fx-reviews--' . $design, 'fx-reviews--align-' . $align ), array_merge( $attrs, array( 'data-fx-reviews' => true ) ) ),
 			$note,
 			$summary,
 			$body,
-			self::notice( $a, count( $list ) )
+			! empty( $a['note'] ) ? '<p class="fx-reviews__note">' . self::notice( $a, count( $list ) ) . '</p>' : ''
 		);
 	}
 

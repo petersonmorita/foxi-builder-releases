@@ -240,6 +240,9 @@ class Form extends Base {
 	const NAME = 'foxi/form';
 
 	protected static function markup( $a, $content, $block ) {
+		if ( ! empty( $a['formId'] ) ) {
+			return self::saved( $a );
+		}
 		$fields  = isset( $a['fields'] ) && is_array( $a['fields'] ) ? $a['fields'] : array();
 		$form_id = \Foxi\Style::clean_id( foxi_get( $a, 'fx.id', '' ) );
 		$hidden  = isset( $a['labels'] ) && 'hidden' === $a['labels'];
@@ -292,6 +295,29 @@ class Form extends Base {
 			esc_attr( time() ),
 			esc_html( isset( $a['submitText'] ) ? $a['submitText'] : __( 'Send message', 'foxi-builder' ) ),
 			esc_attr( isset( $a['successMessage'] ) ? $a['successMessage'] : '' )
+		);
+	}
+
+	/** A form built in Foxi › Forms. */
+	private static function saved( $a ) {
+		$form = \Foxi\Forms\Store::get( (int) $a['formId'] );
+		if ( ! $form ) {
+			if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+				return '<div class="fx-form__closed">' . esc_html__( 'This form was deleted. Choose another form in the block settings.', 'foxi-builder' ) . '</div>';
+			}
+			return current_user_can( 'edit_pages' ) ? '<!-- Foxi: the form chosen for this block no longer exists. -->' : '';
+		}
+		static $n = 0;
+		$uid = \Foxi\Style::clean_id( foxi_get( $a, 'fx.id', '' ) );
+		$uid = ( $uid ? $uid : 'f' . $form['id'] ) . ( $n++ ? '-' . $n : '' );
+		wp_enqueue_script( 'foxi-frontend' );
+		return \Foxi\Forms\View::render(
+			$form,
+			array(
+				'uid'    => $uid,
+				'labels' => isset( $a['labels'] ) && 'hidden' === $a['labels'] ? 'hidden' : 'above',
+			),
+			self::wrapper( $a, array( 'fx-form--saved' ), array( 'data-fx-form' => 'saved' ) )
 		);
 	}
 }

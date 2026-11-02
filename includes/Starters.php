@@ -226,6 +226,35 @@ class Starters {
 	}
 
 	/**
+	 * Contact Form blocks in a starter keep their fields in the block; turn
+	 * each distinct one into a form in Foxi › Forms and point the block at it.
+	 *
+	 * @param array $nodes Resolved block tree.
+	 * @param array $made  Forms created so far in this import (by fingerprint).
+	 */
+	private static function saved_forms( array $nodes, array &$made ) {
+		foreach ( $nodes as &$node ) {
+			if ( 'foxi/form' === $node['name'] && empty( $node['attrs']['formId'] ) && ! empty( $node['attrs']['fields'] ) ) {
+				$a   = $node['attrs'];
+				$key = md5( wp_json_encode( array( $a['fields'], isset( $a['subject'] ) ? $a['subject'] : '' ) ) );
+				if ( ! isset( $made[ $key ] ) ) {
+					$title        = isset( $a['subject'] ) && '' !== $a['subject'] && 'New enquiry from your website' !== $a['subject'] ? $a['subject'] : __( 'Contact form', 'foxi-builder' );
+					$new          = Forms\Store::create( $title, Forms\Store::from_legacy_block( $a ) );
+					$made[ $key ] = is_wp_error( $new ) ? 0 : $new;
+				}
+				if ( $made[ $key ] ) {
+					$node['attrs']['formId'] = $made[ $key ];
+					unset( $node['attrs']['fields'], $node['attrs']['recipient'], $node['attrs']['subject'], $node['attrs']['successMessage'], $node['attrs']['submitText'] );
+				}
+			}
+			if ( ! empty( $node['inner'] ) ) {
+				$node['inner'] = self::saved_forms( $node['inner'], $made );
+			}
+		}
+		return $nodes;
+	}
+
+	/**
 	 * Block tree -> serialized block markup.
 	 */
 	public static function serialize( array $nodes ) {
@@ -453,12 +482,13 @@ class Starters {
 		$migrate = Migrate::applies( $kit ) ? new Migrate( $kit, $ctx ) : null;
 
 		// Pass 2: page content.
+		$forms = array();
 		foreach ( $pages as $p ) {
 			if ( empty( $created[ $p['key'] ] ) ) {
 				continue;
 			}
 			$id      = $created[ $p['key'] ];
-			$content = ! empty( $p['blocks'] ) ? self::serialize( self::resolve( $p['blocks'], $ctx ) ) : ( isset( $p['content'] ) ? (string) $p['content'] : '' );
+			$content = ! empty( $p['blocks'] ) ? self::serialize( self::saved_forms( self::resolve( $p['blocks'], $ctx ), $forms ) ) : ( isset( $p['content'] ) ? (string) $p['content'] : '' );
 			if ( $migrate && empty( $p['blocks'] ) ) {
 				$content = $migrate->content( $content );
 			}

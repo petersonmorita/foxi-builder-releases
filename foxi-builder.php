@@ -3,7 +3,7 @@
  * Plugin Name:       Foxi Builder
  * Plugin URI:        https://foxibuilder.com
  * Description:       A visual page builder for WordPress. Click-to-edit pages, a Brand Kit that re-themes whole sites, Swap Mode for re-skinning starter sites, built-in SEO and schema, and ready-made starter sites.
- * Version:           1.3.0
+ * Version:           1.4.0
  * Requires at least: 6.6
  * Requires PHP:      7.4
  * Author:            Foxi
@@ -16,7 +16,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'FOXI_VERSION', '1.3.0' );
+define( 'FOXI_VERSION', '1.4.0' );
 define( 'FOXI_FILE', __FILE__ );
 define( 'FOXI_DIR', plugin_dir_path( __FILE__ ) );
 define( 'FOXI_URL', plugin_dir_url( __FILE__ ) );
@@ -43,3 +43,9 @@ require_once FOXI_DIR . 'includes/functions.php';
 add_action( 'plugins_loaded', array( 'Foxi\\Plugin', 'instance' ) );
 
 register_activation_hook( __FILE__, array( 'Foxi\\Plugin', 'activate' ) );
+register_deactivation_hook(
+	__FILE__,
+	static function () {
+		wp_clear_scheduled_hook( 'foxi_forms_daily' );
+	}
+);
