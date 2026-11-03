@@ -48,6 +48,8 @@ class Social {
 				'fbPageId'   => '',
 				'fbPageName' => '',
 				'fbToken'    => '',
+				'igBizId'    => '',
+				'igBizUser'  => '',
 				'cacheHours' => 3,
 			)
 		);
@@ -61,7 +63,12 @@ class Social {
 	public static function status() {
 		$o = self::raw();
 		return array(
-			'instagram'  => array( 'connected' => '' !== $o['igToken'], 'username' => $o['igUser'], 'renewed' => $o['igRefreshed'] ? date_i18n( get_option( 'date_format' ), $o['igRefreshed'] ) : '' ),
+			'instagram'  => array(
+				'connected' => '' !== $o['igToken'] || ( '' !== $o['igBizId'] && '' !== $o['fbToken'] ),
+				'username'  => $o['igToken'] ? $o['igUser'] : $o['igBizUser'],
+				'viaPage'   => '' === $o['igToken'] && '' !== $o['igBizId'],
+				'renewed'   => $o['igToken'] && $o['igRefreshed'] ? date_i18n( get_option( 'date_format' ), $o['igRefreshed'] ) : '',
+			),
 			'facebook'   => array( 'connected' => '' !== $o['fbToken'], 'page' => $o['fbPageName'] ),
 			'cacheHours' => (int) $o['cacheHours'],
 		);
@@ -79,8 +86,18 @@ class Social {
 
 	/* ------------------------------ Connecting ----------------------------- */
 
+	/** Tokens are often copied with spaces, quotes or "access_token=" in front. */
+	public static function clean_token( $token ) {
+		$token = trim( (string) $token, " \t\n\r\0\x0B\"'" );
+		$token = preg_replace( '/^(access_token=|bearer\s+)/i', '', $token );
+		return preg_replace( '/\s+/', '', $token );
+	}
+
 	public static function connect_instagram( $token ) {
-		$token = trim( (string) $token );
+		$token = self::clean_token( $token );
+		if ( 0 === strpos( $token, 'EAA' ) ) {
+			return new \WP_Error( 'foxi_ig', __( 'That’s a Facebook token (it starts with EAA), not an Instagram one. Either generate the token under Instagram › “API setup with Instagram login” (it starts with IG), or connect your Facebook Page below: if your Instagram is linked to that Page, Foxi picks it up too.', 'foxi-builder' ) );
+		}
 		$me    = self::request( self::IG . 'me?' . http_build_query( array( 'fields' => 'user_id,username', 'access_token' => $token ) ) );
 		if ( is_wp_error( $me ) ) {
 			return $me;
@@ -115,6 +132,10 @@ class Social {
 	 * @return array|\WP_Error List of { id, name } and stores tokens in a transient for the pick step.
 	 */
 	public static function facebook_pages( $app_id, $secret, $user_token ) {
+		$user_token = self::clean_token( $user_token );
+		if ( 0 === strpos( $user_token, 'IG' ) ) {
+			return new \WP_Error( 'foxi_fb', __( 'That’s an Instagram token (it starts with IG). Paste it into the Instagram box above instead. The Facebook box needs a user token from the Graph API Explorer, which starts with EAA.', 'foxi-builder' ) );
+		}
 		$long = self::request(
 			self::FB . 'oauth/access_token?' . http_build_query(
 				array(
@@ -128,15 +149,16 @@ class Social {
 		if ( is_wp_error( $long ) ) {
 			return $long;
 		}
-		$pages = self::request( self::FB . 'me/accounts?' . http_build_query( array( 'fields' => 'id,name,access_token', 'limit' => 50, 'access_token' => $long['access_token'] ) ) );
+		$pages = self::request( self::FB . 'me/accounts?' . http_build_query( array( 'fields' => 'id,name,access_token,instagram_business_account{id,username}', 'limit' => 50, 'access_token' => $long['access_token'] ) ) );
 		if ( is_wp_error( $pages ) ) {
 			return $pages;
 		}
 		$list = array();
 		$keep = array();
 		foreach ( isset( $pages['data'] ) ? $pages['data'] : array() as $p ) {
-			$list[]            = array( 'id' => (string) $p['id'], 'name' => (string) $p['name'] );
-			$keep[ $p['id'] ] = array( 'name' => (string) $p['name'], 'token' => (string) $p['access_token'] );
+			$ig                = isset( $p['instagram_business_account']['id'] ) ? $p['instagram_business_account'] : null;
+			$list[]            = array( 'id' => (string) $p['id'], 'name' => (string) $p['name'], 'instagram' => $ig && isset( $ig['username'] ) ? (string) $ig['username'] : '' );
+			$keep[ $p['id'] ] = array( 'name' => (string) $p['name'], 'token' => (string) $p['access_token'], 'igId' => $ig ? (string) $ig['id'] : '', 'igUser' => $ig && isset( $ig['username'] ) ? (string) $ig['username'] : '' );
 		}
 		if ( ! $list ) {
 			return new \WP_Error( 'foxi_fb', __( 'No Facebook Pages were found. Make sure the token has the pages_show_list and pages_read_engagement permissions and that you manage the Page.', 'foxi-builder' ) );
@@ -152,15 +174,25 @@ class Social {
 			return new \WP_Error( 'foxi_fb', __( 'That took too long. Paste the token and connect again.', 'foxi-builder' ) );
 		}
 		delete_transient( 'foxi_fb_pick_' . get_current_user_id() );
-		self::save( array( 'fbPageId' => sanitize_text_field( $page_id ), 'fbPageName' => sanitize_text_field( $keep[ $page_id ]['name'] ), 'fbToken' => Config::encrypt( $keep[ $page_id ]['token'] ) ) );
+		$k = $keep[ $page_id ];
+		self::save(
+			array(
+				'fbPageId'   => sanitize_text_field( $page_id ),
+				'fbPageName' => sanitize_text_field( $k['name'] ),
+				'fbToken'    => Config::encrypt( $k['token'] ),
+				// The Instagram business account linked to this Page, if any.
+				'igBizId'    => isset( $k['igId'] ) ? preg_replace( '/\D/', '', $k['igId'] ) : '',
+				'igBizUser'  => isset( $k['igUser'] ) ? sanitize_text_field( $k['igUser'] ) : '',
+			)
+		);
 		return self::status();
 	}
 
 	public static function disconnect( $network ) {
 		if ( 'instagram' === $network ) {
-			self::save( array( 'igToken' => '', 'igUser' => '' ) );
+			self::save( array( 'igToken' => '', 'igUser' => '', 'igBizId' => '', 'igBizUser' => '' ) );
 		} elseif ( 'facebook' === $network ) {
-			self::save( array( 'fbToken' => '', 'fbPageId' => '', 'fbPageName' => '' ) );
+			self::save( array( 'fbToken' => '', 'fbPageId' => '', 'fbPageName' => '', 'igBizId' => '', 'igBizUser' => '' ) );
 		}
 		return self::status();
 	}
@@ -215,11 +247,18 @@ class Social {
 
 	private static function fetch_instagram() {
 		$token = self::token( 'igToken' );
+		$base  = self::IG . 'me/media?';
+		if ( ! $token ) {
+			// Instagram linked to the connected Facebook Page.
+			$o     = self::raw();
+			$token = $o['igBizId'] ? self::token( 'fbToken' ) : '';
+			$base  = self::FB . rawurlencode( $o['igBizId'] ) . '/media?';
+		}
 		if ( ! $token ) {
 			return new \WP_Error( 'foxi_ig_none', __( 'Connect Instagram in Foxi › Settings › Social media.', 'foxi-builder' ) );
 		}
 		$res = self::request(
-			self::IG . 'me/media?' . http_build_query(
+			$base . http_build_query(
 				array(
 					'fields'       => 'id,caption,media_type,media_url,thumbnail_url,permalink,timestamp,username',
 					'limit'        => 25,
@@ -299,6 +338,11 @@ class Social {
 		$body = json_decode( wp_remote_retrieve_body( $res ), true );
 		if ( isset( $body['error'] ) ) {
 			$msg = isset( $body['error']['message'] ) ? $body['error']['message'] : __( 'The social network refused the request.', 'foxi-builder' );
+			if ( false !== stripos( $msg, 'parse access token' ) ) {
+				$msg = __( 'Meta couldn’t read that token. Copy it again with the Copy button (all of it, no spaces), and check it’s the right kind: Instagram tokens start with IG, Facebook tokens start with EAA.', 'foxi-builder' );
+			} elseif ( false !== stripos( $msg, 'expired' ) || false !== stripos( $msg, 'Session has' ) ) {
+				$msg = __( 'That token has expired. Generate a new one and paste it again.', 'foxi-builder' );
+			}
 			return new \WP_Error( 'foxi_social_api', sanitize_text_field( $msg ) );
 		}
 		return is_array( $body ) ? $body : new \WP_Error( 'foxi_social_api', __( 'Unexpected reply from the social network.', 'foxi-builder' ) );

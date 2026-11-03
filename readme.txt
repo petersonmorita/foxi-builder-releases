@@ -4,7 +4,7 @@ Tags: page builder, visual editor, blocks, seo, starter sites
 Requires at least: 6.6
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.7.0
+Stable tag: 1.7.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,6 +47,10 @@ Import the Panorama Retreat template: the full panoramaretreat.com.au website (1
 4. Edit any page: Foxi Studio opens automatically.
 
 == Changelog ==
+
+= 1.7.1 =
+* Social media: connecting a Facebook Page now also brings in the Instagram Business account linked to it, so you don't need a separate Instagram token.
+* Clearer messages when a token can't be read, has expired, or is the wrong kind (Facebook tokens start with EAA, Instagram tokens with IG). Spaces, quotes and "access_token=" copied with a token are removed automatically.
 
 = 1.7.0 =
 * New Social Feed block: your latest Instagram and/or Facebook Page posts, updated automatically, in six designs (grid with captions on hover, cards, carousel, collage, masonry and a full-width strip), with an optional @name and follow button. Posts can also be added by hand, e.g. for LinkedIn. Connect accounts in Foxi › Settings › Social media; the Instagram connection renews itself.
