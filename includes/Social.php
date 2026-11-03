@@ -131,37 +131,68 @@ class Social {
 	 *
 	 * @return array|\WP_Error List of { id, name } and stores tokens in a transient for the pick step.
 	 */
+	/**
+	 * Find the Facebook Pages (and their linked Instagram accounts) a token can read.
+	 *
+	 * Works with the tokens newer Meta apps ("Unified login") give out:
+	 * - a System User token from Meta Business settings (recommended: it
+	 *   never expires and needs no App ID or secret),
+	 * - a Page token,
+	 * - or a short user token plus the App ID and secret, which is swapped
+	 *   for a lasting one.
+	 *
+	 * @return array|\WP_Error List of { id, name, instagram }; tokens wait in a transient for the pick step.
+	 */
 	public static function facebook_pages( $app_id, $secret, $user_token ) {
-		$user_token = self::clean_token( $user_token );
-		if ( 0 === strpos( $user_token, 'IG' ) ) {
-			return new \WP_Error( 'foxi_fb', __( 'That’s an Instagram token (it starts with IG). Paste it into the Instagram box above instead. The Facebook box needs a user token from the Graph API Explorer, which starts with EAA.', 'foxi-builder' ) );
+		$token = self::clean_token( $user_token );
+		if ( 0 === strpos( $token, 'IG' ) ) {
+			return new \WP_Error( 'foxi_fb', __( 'That’s an Instagram Login token (it starts with IG). Paste it into the Instagram box instead. This box needs a Facebook token, which starts with EAA.', 'foxi-builder' ) );
 		}
-		$long = self::request(
-			self::FB . 'oauth/access_token?' . http_build_query(
-				array(
-					'grant_type'        => 'fb_exchange_token',
-					'client_id'         => trim( $app_id ),
-					'client_secret'     => trim( $secret ),
-					'fb_exchange_token' => trim( $user_token ),
+		if ( '' === $token ) {
+			return new \WP_Error( 'foxi_fb', __( 'Paste the access token first.', 'foxi-builder' ) );
+		}
+		// A short user token lasts an hour; with the app's ID and secret it can be swapped for a lasting one.
+		// System User and Page tokens can't be swapped and don't need to be, so carry on with the original.
+		if ( '' !== trim( (string) $app_id ) && '' !== trim( (string) $secret ) ) {
+			$long = self::request(
+				self::FB . 'oauth/access_token?' . http_build_query(
+					array(
+						'grant_type'        => 'fb_exchange_token',
+						'client_id'         => trim( $app_id ),
+						'client_secret'     => trim( $secret ),
+						'fb_exchange_token' => $token,
+					)
 				)
-			)
-		);
-		if ( is_wp_error( $long ) ) {
-			return $long;
+			);
+			if ( ! is_wp_error( $long ) && ! empty( $long['access_token'] ) ) {
+				$token = $long['access_token'];
+			}
 		}
-		$pages = self::request( self::FB . 'me/accounts?' . http_build_query( array( 'fields' => 'id,name,access_token,instagram_business_account{id,username}', 'limit' => 50, 'access_token' => $long['access_token'] ) ) );
+
+		$fields = 'id,name,access_token,instagram_business_account{id,username}';
+		$pages  = self::request( self::FB . 'me/accounts?' . http_build_query( array( 'fields' => $fields, 'limit' => 50, 'access_token' => $token ) ) );
+		$found  = array();
 		if ( is_wp_error( $pages ) ) {
-			return $pages;
+			// A Page token is the Page itself: it has no "accounts".
+			$page = self::request( self::FB . 'me?' . http_build_query( array( 'fields' => 'id,name,instagram_business_account{id,username}', 'access_token' => $token ) ) );
+			if ( is_wp_error( $page ) || empty( $page['id'] ) || ( ! array_key_exists( 'instagram_business_account', $page ) && false === stripos( $pages->get_error_message(), 'node type (Page)' ) ) ) {
+				return $pages;
+			}
+			$page['access_token'] = $token;
+			$found[]              = $page;
+		} else {
+			$found = isset( $pages['data'] ) ? $pages['data'] : array();
 		}
+
 		$list = array();
 		$keep = array();
-		foreach ( isset( $pages['data'] ) ? $pages['data'] : array() as $p ) {
+		foreach ( $found as $p ) {
 			$ig                = isset( $p['instagram_business_account']['id'] ) ? $p['instagram_business_account'] : null;
 			$list[]            = array( 'id' => (string) $p['id'], 'name' => (string) $p['name'], 'instagram' => $ig && isset( $ig['username'] ) ? (string) $ig['username'] : '' );
-			$keep[ $p['id'] ] = array( 'name' => (string) $p['name'], 'token' => (string) $p['access_token'], 'igId' => $ig ? (string) $ig['id'] : '', 'igUser' => $ig && isset( $ig['username'] ) ? (string) $ig['username'] : '' );
+			$keep[ $p['id'] ] = array( 'name' => (string) $p['name'], 'token' => (string) ( isset( $p['access_token'] ) ? $p['access_token'] : $token ), 'igId' => $ig ? (string) $ig['id'] : '', 'igUser' => $ig && isset( $ig['username'] ) ? (string) $ig['username'] : '' );
 		}
 		if ( ! $list ) {
-			return new \WP_Error( 'foxi_fb', __( 'No Facebook Pages were found. Make sure the token has the pages_show_list and pages_read_engagement permissions and that you manage the Page.', 'foxi-builder' ) );
+			return new \WP_Error( 'foxi_fb', __( 'The token works, but no Facebook Pages came with it. In Meta Business settings, give the System User the hotel’s Page (and Instagram account) under Assign assets, then generate the token again with pages_show_list, pages_read_engagement and instagram_basic.', 'foxi-builder' ) );
 		}
 		set_transient( 'foxi_fb_pick_' . get_current_user_id(), Config::encrypt( wp_json_encode( $keep ) ), 15 * MINUTE_IN_SECONDS );
 		return $list;
