@@ -50,6 +50,8 @@ class Social {
 				'fbToken'    => '',
 				'igBizId'    => '',
 				'igBizUser'  => '',
+				'behold'     => '',
+				'beholdUser' => '',
 				'cacheHours' => 3,
 			)
 		);
@@ -64,9 +66,10 @@ class Social {
 		$o = self::raw();
 		return array(
 			'instagram'  => array(
-				'connected' => '' !== $o['igToken'] || ( '' !== $o['igBizId'] && '' !== $o['fbToken'] ),
-				'username'  => $o['igToken'] ? $o['igUser'] : $o['igBizUser'],
+				'connected' => '' !== $o['igToken'] || ( '' !== $o['igBizId'] && '' !== $o['fbToken'] ) || '' !== $o['behold'],
+				'username'  => $o['igToken'] ? $o['igUser'] : ( $o['igBizId'] ? $o['igBizUser'] : $o['beholdUser'] ),
 				'viaPage'   => '' === $o['igToken'] && '' !== $o['igBizId'],
+				'viaBehold' => '' === $o['igToken'] && '' === $o['igBizId'] && '' !== $o['behold'],
 				'renewed'   => $o['igToken'] && $o['igRefreshed'] ? date_i18n( get_option( 'date_format' ), $o['igRefreshed'] ) : '',
 			),
 			'facebook'   => array( 'connected' => '' !== $o['fbToken'], 'page' => $o['fbPageName'] ),
@@ -112,6 +115,73 @@ class Social {
 		}
 		self::save( array( 'igToken' => Config::encrypt( $token ), 'igUser' => sanitize_text_field( $me['username'] ), 'igRefreshed' => time() ) );
 		return self::status();
+	}
+
+	/**
+	 * Instagram through Behold (behold.so): Behold holds the Meta connection,
+	 * so no Meta developer account is needed. Foxi reads the feed's JSON.
+	 */
+	public static function connect_behold( $url ) {
+		$url = trim( (string) $url );
+		if ( preg_match( '/^[A-Za-z0-9]{10,40}$/', $url ) ) {
+			$url = 'https://feeds.behold.so/' . $url; // Just the feed ID was pasted.
+		}
+		$host = wp_parse_url( $url, PHP_URL_HOST );
+		if ( ! $host || ! preg_match( '/(^|\.)behold\.so$/', $host ) ) {
+			return new \WP_Error( 'foxi_behold', __( 'Paste the JSON feed URL from Behold. It looks like https://feeds.behold.so/…', 'foxi-builder' ) );
+		}
+		$feed = self::behold_posts( esc_url_raw( $url ) );
+		if ( is_wp_error( $feed ) ) {
+			return $feed;
+		}
+		self::save( array( 'behold' => esc_url_raw( $url ), 'beholdUser' => $feed['username'] ) );
+		return self::status();
+	}
+
+	private static function behold_posts( $url ) {
+		$res = wp_remote_get( $url, array( 'timeout' => 12 ) );
+		if ( is_wp_error( $res ) || 200 !== (int) wp_remote_retrieve_response_code( $res ) ) {
+			return new \WP_Error( 'foxi_behold', __( 'Couldn’t read that Behold feed. Check the URL, and that the feed is set to “JSON” in Behold.', 'foxi-builder' ) );
+		}
+		$body  = json_decode( wp_remote_retrieve_body( $res ), true );
+		$posts = isset( $body['posts'] ) && is_array( $body['posts'] ) ? $body['posts'] : ( is_array( $body ) && isset( $body[0] ) ? $body : array() );
+		$user  = isset( $body['username'] ) ? sanitize_text_field( $body['username'] ) : '';
+		$out   = array();
+		foreach ( $posts as $m ) {
+			if ( ! is_array( $m ) ) {
+				continue;
+			}
+			$type  = isset( $m['mediaType'] ) ? $m['mediaType'] : '';
+			$video = 'VIDEO' === $type;
+			$image = '';
+			foreach ( array( 'large', 'medium', 'full' ) as $size ) {
+				if ( ! $image && ! empty( $m['sizes'][ $size ]['mediaUrl'] ) ) {
+					$image = $m['sizes'][ $size ]['mediaUrl'];
+				}
+			}
+			if ( ! $image ) {
+				$image = $video && ! empty( $m['thumbnailUrl'] ) ? $m['thumbnailUrl'] : ( isset( $m['mediaUrl'] ) ? $m['mediaUrl'] : '' );
+			}
+			if ( ! $image ) {
+				continue;
+			}
+			$out[] = array(
+				'id'      => 'ig_' . ( isset( $m['id'] ) ? sanitize_key( $m['id'] ) : md5( $image ) ),
+				'network' => 'instagram',
+				'image'   => esc_url_raw( $image ),
+				'video'   => $video,
+				'album'   => 'CAROUSEL_ALBUM' === $type,
+				'caption' => isset( $m['caption'] ) ? sanitize_textarea_field( $m['caption'] ) : '',
+				'alt'     => ! empty( $m['altText'] ) ? sanitize_text_field( $m['altText'] ) : null,
+				'url'     => esc_url_raw( isset( $m['permalink'] ) ? $m['permalink'] : '' ),
+				'date'    => isset( $m['timestamp'] ) ? gmdate( 'c', strtotime( $m['timestamp'] ) ) : '',
+				'author'  => $user,
+			);
+		}
+		if ( ! $out ) {
+			return new \WP_Error( 'foxi_behold', __( 'That Behold feed has no posts yet. Check it’s connected to the hotel’s Instagram in Behold.', 'foxi-builder' ) );
+		}
+		return array( 'username' => $user, 'posts' => $out );
 	}
 
 	/** Weekly: renew the 60-day Instagram token so it never runs out. */
@@ -221,7 +291,7 @@ class Social {
 
 	public static function disconnect( $network ) {
 		if ( 'instagram' === $network ) {
-			self::save( array( 'igToken' => '', 'igUser' => '', 'igBizId' => '', 'igBizUser' => '' ) );
+			self::save( array( 'igToken' => '', 'igUser' => '', 'igBizId' => '', 'igBizUser' => '', 'behold' => '', 'beholdUser' => '' ) );
 		} elseif ( 'facebook' === $network ) {
 			self::save( array( 'fbToken' => '', 'fbPageId' => '', 'fbPageName' => '', 'igBizId' => '', 'igBizUser' => '' ) );
 		}
@@ -279,9 +349,13 @@ class Social {
 	private static function fetch_instagram() {
 		$token = self::token( 'igToken' );
 		$base  = self::IG . 'me/media?';
+		$o     = self::raw();
+		if ( ! $token && ! $o['igBizId'] && $o['behold'] ) {
+			$feed = self::behold_posts( $o['behold'] );
+			return is_wp_error( $feed ) ? $feed : $feed['posts'];
+		}
 		if ( ! $token ) {
 			// Instagram linked to the connected Facebook Page.
-			$o     = self::raw();
 			$token = $o['igBizId'] ? self::token( 'fbToken' ) : '';
 			$base  = self::FB . rawurlencode( $o['igBizId'] ) . '/media?';
 		}
@@ -402,6 +476,9 @@ class Social {
 					'permission_callback' => $manage,
 					'callback'            => static function ( \WP_REST_Request $r ) {
 						$do = (string) $r->get_param( 'action' );
+						if ( 'behold' === $do ) {
+							return self::connect_behold( (string) $r->get_param( 'url' ) );
+						}
 						if ( 'instagram' === $do ) {
 							return self::connect_instagram( (string) $r->get_param( 'token' ) );
 						}

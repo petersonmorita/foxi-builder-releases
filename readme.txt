@@ -4,7 +4,7 @@ Tags: page builder, visual editor, blocks, seo, starter sites
 Requires at least: 6.6
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.7.3
+Stable tag: 1.8.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,6 +47,9 @@ Import the Panorama Retreat template: the full panoramaretreat.com.au website (1
 4. Edit any page: Foxi Studio opens automatically.
 
 == Changelog ==
+
+= 1.8.0 =
+* Social media: connect Instagram through Behold (behold.so) without a Meta developer account. Paste Behold's JSON feed URL in Foxi › Settings › Social media. The free Behold plan shows your 6 latest posts, updated daily, and uses Instagram's own alt text where there is one.
 
 = 1.7.3 =
 * Social media: when Meta blocks an app ("API access blocked"), Foxi now explains that the fix is in the Meta app dashboard.
