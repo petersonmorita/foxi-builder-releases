@@ -4,7 +4,7 @@ Tags: page builder, visual editor, blocks, seo, starter sites
 Requires at least: 6.6
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.7.2
+Stable tag: 1.7.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,6 +47,10 @@ Import the Panorama Retreat template: the full panoramaretreat.com.au website (1
 4. Edit any page: Foxi Studio opens automatically.
 
 == Changelog ==
+
+= 1.7.3 =
+* Social media: when Meta blocks an app ("API access blocked"), Foxi now explains that the fix is in the Meta app dashboard.
+* Social media now uses the Meta app's own Graph API version instead of a fixed one that Meta retires.
 
 = 1.7.2 =
 * Social media works with new Meta apps ("Unified login"), which no longer offer the Instagram Login token. Connect with a System User token from Meta Business settings: it never expires and needs no App ID or secret. Page tokens work too, and the Instagram account linked to the Page comes with it.

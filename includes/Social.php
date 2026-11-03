@@ -25,7 +25,7 @@ class Social {
 
 	const OPTION = 'foxi_social';
 	const IG     = 'https://graph.instagram.com/';
-	const FB     = 'https://graph.facebook.com/v21.0/';
+	const FB     = 'https://graph.facebook.com/';
 
 	public function init() {
 		add_action( 'rest_api_init', array( $this, 'routes' ) );
@@ -369,7 +369,10 @@ class Social {
 		$body = json_decode( wp_remote_retrieve_body( $res ), true );
 		if ( isset( $body['error'] ) ) {
 			$msg = isset( $body['error']['message'] ) ? $body['error']['message'] : __( 'The social network refused the request.', 'foxi-builder' );
-			if ( false !== stripos( $msg, 'parse access token' ) ) {
+			$code = isset( $body['error']['code'] ) ? (int) $body['error']['code'] : 0;
+			if ( 200 === $code && false !== stripos( $msg, 'blocked' ) ) {
+				$msg = __( 'Meta has blocked your Meta app from reading posts (“API access blocked”). This is set on Meta’s side, not in Foxi: open your app at developers.facebook.com and follow any red warning or “Required actions” there, or switch the app back to Development mode.', 'foxi-builder' );
+			} elseif ( false !== stripos( $msg, 'parse access token' ) ) {
 				$msg = __( 'Meta couldn’t read that token. Copy it again with the Copy button (all of it, no spaces), and check it’s the right kind: Instagram tokens start with IG, Facebook tokens start with EAA.', 'foxi-builder' );
 			} elseif ( false !== stripos( $msg, 'expired' ) || false !== stripos( $msg, 'Session has' ) ) {
 				$msg = __( 'That token has expired. Generate a new one and paste it again.', 'foxi-builder' );
