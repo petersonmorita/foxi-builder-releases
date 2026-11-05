@@ -35,6 +35,12 @@ class Reviews extends SwiperBase {
 		$preview = defined( 'REST_REQUEST' ) && REST_REQUEST;
 		$data    = \Foxi\Reviews::get( isset( $a['placeId'] ) ? $a['placeId'] : '' );
 		$note    = '';
+		$extra   = self::extra( isset( $a['extra'] ) && is_array( $a['extra'] ) ? $a['extra'] : array() );
+		if ( is_wp_error( $data ) && $extra ) {
+			// Google isn't connected (or is down): the reviews added by hand still show.
+			$data = array( 'name' => '', 'rating' => 0, 'count' => 0, 'url' => '', 'reviewsUrl' => '', 'writeUrl' => '', 'reviews' => array() );
+			$a['summary'] = false;
+		}
 		if ( is_wp_error( $data ) ) {
 			if ( ! $preview ) {
 				return current_user_can( 'edit_pages' ) ? '<!-- Foxi Google Reviews: ' . esc_html( $data->get_error_message() ) . ' -->' : '';
@@ -44,7 +50,7 @@ class Reviews extends SwiperBase {
 		}
 
 		$design = isset( $a['design'] ) && in_array( $a['design'], self::DESIGNS, true ) ? $a['design'] : 'carousel';
-		$list   = self::filter( $data['reviews'], $a );
+		$list   = self::filter( array_merge( $data['reviews'], $extra ), $a );
 		$uid    = \Foxi\Style::clean_id( foxi_get( $a, 'fx.id', 'r' ) );
 
 		$vars   = array();
@@ -164,6 +170,44 @@ class Reviews extends SwiperBase {
 		return esc_html( implode( ' · ', $parts ) );
 	}
 
+	/** Where a review added by hand came from. */
+	const SOURCES = array(
+		'google'      => 'Google',
+		'tripadvisor' => 'Tripadvisor',
+		'booking'     => 'Booking.com',
+		'expedia'     => 'Expedia',
+		'facebook'    => 'Facebook',
+		'direct'      => '',
+	);
+
+	/** Reviews added by hand in the block, in the same shape as Google's. */
+	private static function extra( array $items ) {
+		$out = array();
+		foreach ( $items as $i => $x ) {
+			if ( ! is_array( $x ) || '' === trim( (string) ( $x['text'] ?? '' ) ) && '' === trim( (string) ( $x['author'] ?? '' ) ) ) {
+				continue;
+			}
+			$time  = ! empty( $x['date'] ) && preg_match( '/^\d{4}-\d{2}(-\d{2})?$/', $x['date'] ) ? $x['date'] . ( 7 === strlen( $x['date'] ) ? '-01' : '' ) . 'T00:00:00Z' : '';
+			$src   = isset( $x['source'], self::SOURCES[ $x['source'] ] ) ? $x['source'] : 'google';
+			$out[] = array(
+				'id'         => 'own-' . $i,
+				'rating'     => max( 1, min( 5, (int) ( $x['rating'] ?? 5 ) ) ),
+				'text'       => (string) ( $x['text'] ?? '' ),
+				'original'   => '',
+				'translated' => false,
+				'author'     => (string) ( $x['author'] ?? '' ),
+				'authorUrl'  => '',
+				'photo'      => '',
+				'time'       => $time,
+				/* translators: %s: time, e.g. "3 months" */
+				'relative'   => $time ? sprintf( __( '%s ago', 'foxi-builder' ), human_time_diff( strtotime( $time ), time() ) ) : '',
+				'url'        => isset( $x['url'] ) ? esc_url_raw( (string) $x['url'] ) : '',
+				'source'     => $src,
+			);
+		}
+		return $out;
+	}
+
 	private static function filter( array $reviews, array $a ) {
 		$min    = (int) ( isset( $a['minRating'] ) ? $a['minRating'] : 0 );
 		$text   = ! empty( $a['withText'] );
@@ -194,7 +238,7 @@ class Reviews extends SwiperBase {
 				return $y['rating'] === $x['rating'] ? strcmp( $y['time'], $x['time'] ) : $y['rating'] - $x['rating'];
 			} );
 		}
-		$limit = max( 1, min( 5, (int) ( isset( $a['limit'] ) ? $a['limit'] : 5 ) ) );
+		$limit = max( 1, min( 30, (int) ( isset( $a['limit'] ) ? $a['limit'] : 5 ) ) );
 		return array_slice( $out, 0, $limit );
 	}
 
@@ -214,8 +258,14 @@ class Reviews extends SwiperBase {
 			$label = 'date' === $style && $ts ? wp_date( get_option( 'date_format' ), $ts ) : $r['relative'];
 			$date  = sprintf( '<time class="fx-review__date"%s>%s</time>', $ts ? ' datetime="' . esc_attr( gmdate( 'c', $ts ) ) . '"' : '', esc_html( $label ) );
 		}
-		$mark = ! empty( $a['googleMark'] ) ? '<span class="fx-review__g" title="Google">' . self::g_logo() . '</span>' : '';
-		$link = $r['url'] ? sprintf( '<a class="fx-review__link" href="%s" target="_blank" rel="noopener">%s</a>', esc_url( $r['url'] ), esc_html__( 'View on Google', 'foxi-builder' ) ) : '';
+		$src  = isset( $r['source'] ) ? $r['source'] : 'google';
+		$site = self::SOURCES[ $src ] ?? '';
+		$mark = '';
+		if ( ! empty( $a['googleMark'] ) ) {
+			$mark = 'google' === $src ? '<span class="fx-review__g" title="Google">' . self::g_logo() . '</span>' : ( $site ? '<span class="fx-review__src">' . esc_html( $site ) . '</span>' : '' );
+		}
+		/* translators: %s: review site, e.g. Google */
+		$link = $r['url'] ? sprintf( '<a class="fx-review__link" href="%s" target="_blank" rel="noopener">%s</a>', esc_url( $r['url'] ), esc_html( sprintf( __( 'View on %s', 'foxi-builder' ), $site ? $site : __( 'the review site', 'foxi-builder' ) ) ) ) : '';
 		$tr   = $r['translated'] ? '<span class="fx-review__translated">' . esc_html__( 'Translated by Google', 'foxi-builder' ) . '</span>' : '';
 		$text = '' !== trim( $r['text'] ) ? '<div class="fx-review__text"><p>' . nl2br( esc_html( $r['text'] ) ) . '</p></div><button type="button" class="fx-review__more" aria-expanded="false" data-less="' . esc_attr__( 'Read less', 'foxi-builder' ) . '" hidden>' . esc_html__( 'Read more', 'foxi-builder' ) . '</button>' : '';
 

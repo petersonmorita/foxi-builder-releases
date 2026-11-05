@@ -46,6 +46,10 @@
 			"type": "number",
 			"default": 5
 		},
+		"extra": {
+			"type": "array",
+			"default": []
+		},
 		"hidden": {
 			"type": "array",
 			"default": []
