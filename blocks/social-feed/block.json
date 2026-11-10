@@ -10,6 +10,7 @@
 	"attributes": {
 		"fx": { "type": "object", "default": {} },
 		"source": { "type": "string", "default": "instagram" },
+		"username": { "type": "string", "default": "" },
 		"manual": { "type": "array", "default": [] },
 		"design": { "type": "string", "default": "grid" },
 		"limit": { "type": "number", "default": 6 },

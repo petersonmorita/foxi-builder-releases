@@ -4,7 +4,7 @@ Tags: page builder, visual editor, blocks, seo, starter sites
 Requires at least: 6.6
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.8.1
+Stable tag: 1.9.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,6 +47,9 @@ Import the Panorama Retreat template: the full panoramaretreat.com.au website (1
 4. Edit any page: Foxi Studio opens automatically.
 
 == Changelog ==
+
+= 1.9.0 =
+* Social Feed: new "Instagram @name" source. Type any public Instagram Business or Creator username (e.g. each of your properties) and the block shows its latest posts in any design. It uses the Instagram account linked to the Facebook Page connected in Foxi › Settings › Social media (Meta's Business Discovery), so one connection serves every property. Posts update every 6 hours.
 
 = 1.8.1 =
 * Google Reviews: add your own reviews in the block (name, stars, text, month, where it's from and a link). They show alongside the 5 that Google shares, with the same filters and design, labelled Google, Tripadvisor, Booking.com, Expedia, Facebook or direct from a guest. They still show if Google isn't connected. Up to 20 reviews can now be shown.

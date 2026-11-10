@@ -16,14 +16,14 @@ class SocialFeed extends SwiperBase {
 
 	protected static function markup( $a, $content, $block ) {
 		$design = in_array( foxi_get( $a, 'design' ), self::DESIGNS, true ) ? $a['design'] : 'grid';
-		$source = in_array( foxi_get( $a, 'source' ), array( 'instagram', 'facebook', 'both', 'manual' ), true ) ? $a['source'] : 'instagram';
+		$source = in_array( foxi_get( $a, 'source' ), array( 'instagram', 'username', 'facebook', 'both', 'manual' ), true ) ? $a['source'] : 'instagram';
 		$limit  = max( 1, min( 24, (int) foxi_get( $a, 'limit', 6 ) ) );
 		$note   = '';
 
 		if ( 'manual' === $source ) {
 			$posts = self::manual( isset( $a['manual'] ) && is_array( $a['manual'] ) ? $a['manual'] : array() );
 		} else {
-			$posts = \Foxi\Social::posts( $source, 'collage' === $design ? $limit + 6 : $limit );
+			$posts = \Foxi\Social::posts( $source, 'collage' === $design ? $limit + 6 : $limit, (string) foxi_get( $a, 'username', '' ) );
 			if ( is_wp_error( $posts ) ) {
 				if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
 					$note  = '<div class="fx-social__setup">' . esc_html( $posts->get_error_message() ) . ' ' . esc_html__( 'Showing sample posts until then.', 'foxi-builder' ) . '</div>';
@@ -187,7 +187,7 @@ class SocialFeed extends SwiperBase {
 
 	private static function head( $a, $source, $posts ) {
 		$s    = \Foxi\Social::status();
-		$user = 'facebook' === $source ? $s['facebook']['page'] : $s['instagram']['username'];
+		$user = 'facebook' === $source ? $s['facebook']['page'] : ( 'username' === $source ? \Foxi\Social::clean_username( foxi_get( $a, 'username', '' ) ) : $s['instagram']['username'] );
 		$url  = ! empty( $a['followUrl'] ) ? $a['followUrl'] : ( 'facebook' !== $source && $user ? 'https://www.instagram.com/' . rawurlencode( $user ) . '/' : ( $posts[0]['url'] ?? '' ) );
 		$net  = 'manual' === $source ? ( $posts[0]['network'] ?? 'instagram' ) : ( 'facebook' === $source ? 'facebook' : 'instagram' );
 		$text = ! empty( $a['headerText'] ) ? $a['headerText'] : ( $user ? ( 'facebook' === $source ? $user : '@' . $user ) : '' );

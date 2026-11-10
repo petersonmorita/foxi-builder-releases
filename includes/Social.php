@@ -52,6 +52,7 @@ class Social {
 				'igBizUser'  => '',
 				'behold'     => '',
 				'beholdUser' => '',
+				'fbUserToken' => '',
 				'cacheHours' => 3,
 			)
 		);
@@ -73,6 +74,7 @@ class Social {
 				'renewed'   => $o['igToken'] && $o['igRefreshed'] ? date_i18n( get_option( 'date_format' ), $o['igRefreshed'] ) : '',
 			),
 			'facebook'   => array( 'connected' => '' !== $o['fbToken'], 'page' => $o['fbPageName'] ),
+			'lookup'     => '' !== $o['igBizId'] && ( '' !== $o['fbUserToken'] || '' !== $o['fbToken'] ),
 			'cacheHours' => (int) $o['cacheHours'],
 		);
 	}
@@ -85,6 +87,8 @@ class Social {
 	public static function flush() {
 		delete_transient( 'foxi_social_instagram' );
 		delete_transient( 'foxi_social_facebook' );
+		global $wpdb;
+		$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '\\_transient\\_foxi\\_social\\_igu\\_%' OR option_name LIKE '\\_transient\\_timeout\\_foxi\\_social\\_igu\\_%'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 	}
 
 	/* ------------------------------ Connecting ----------------------------- */
@@ -264,6 +268,7 @@ class Social {
 		if ( ! $list ) {
 			return new \WP_Error( 'foxi_fb', __( 'The token works, but no Facebook Pages came with it. In Meta Business settings, give the System User the hotel’s Page (and Instagram account) under Assign assets, then generate the token again with pages_show_list, pages_read_engagement and instagram_basic.', 'foxi-builder' ) );
 		}
+		$keep['_user'] = $token;
 		set_transient( 'foxi_fb_pick_' . get_current_user_id(), Config::encrypt( wp_json_encode( $keep ) ), 15 * MINUTE_IN_SECONDS );
 		return $list;
 	}
@@ -278,6 +283,7 @@ class Social {
 		$k = $keep[ $page_id ];
 		self::save(
 			array(
+				'fbUserToken' => ! empty( $keep['_user'] ) ? Config::encrypt( $keep['_user'] ) : '',
 				'fbPageId'   => sanitize_text_field( $page_id ),
 				'fbPageName' => sanitize_text_field( $k['name'] ),
 				'fbToken'    => Config::encrypt( $k['token'] ),
@@ -293,7 +299,7 @@ class Social {
 		if ( 'instagram' === $network ) {
 			self::save( array( 'igToken' => '', 'igUser' => '', 'igBizId' => '', 'igBizUser' => '', 'behold' => '', 'beholdUser' => '' ) );
 		} elseif ( 'facebook' === $network ) {
-			self::save( array( 'fbToken' => '', 'fbPageId' => '', 'fbPageName' => '', 'igBizId' => '', 'igBizUser' => '' ) );
+			self::save( array( 'fbToken' => '', 'fbUserToken' => '', 'fbPageId' => '', 'fbPageName' => '', 'igBizId' => '', 'igBizUser' => '' ) );
 		}
 		return self::status();
 	}
@@ -306,7 +312,11 @@ class Social {
 	 * @param string $source instagram, facebook or both.
 	 * @return array|\WP_Error
 	 */
-	public static function posts( $source = 'instagram', $limit = 12 ) {
+	public static function posts( $source = 'instagram', $limit = 12, $username = '' ) {
+		if ( 'username' === $source ) {
+			$got = self::by_username( $username );
+			return is_wp_error( $got ) ? $got : array_slice( $got, 0, max( 1, min( 30, (int) $limit ) ) );
+		}
 		$nets  = 'both' === $source ? array( 'instagram', 'facebook' ) : array( $source );
 		$posts = array();
 		$error = null;
@@ -323,6 +333,74 @@ class Social {
 		}
 		usort( $posts, static function ( $a, $b ) { return strcmp( $b['date'], $a['date'] ); } );
 		return array_slice( $posts, 0, max( 1, min( 30, (int) $limit ) ) );
+	}
+
+	/** "@name", "instagram.com/name/" or "name" → "name" ('' if it can't be a username). */
+	public static function clean_username( $u ) {
+		$u = trim( (string) $u );
+		if ( preg_match( '#instagram\.com/([^/?\#]+)#i', $u, $m ) ) {
+			$u = $m[1];
+		}
+		$u = strtolower( ltrim( $u, '@' ) );
+		return preg_match( '/^[a-z0-9._]{1,30}$/', $u ) ? $u : '';
+	}
+
+	/**
+	 * Latest posts of any public Instagram Business or Creator account, by
+	 * username, through the connected account (Meta's "Business Discovery").
+	 * Meta limits how often this can run, so it's cached for at least 6 hours.
+	 */
+	private static function by_username( $username ) {
+		$u = self::clean_username( $username );
+		if ( ! $u ) {
+			return new \WP_Error( 'foxi_igu', __( 'Type the Instagram username in the block settings, e.g. cairnssouthgatehotel.', 'foxi-builder' ) );
+		}
+		$key = 'foxi_social_igu_' . md5( $u );
+		$hit = get_transient( $key );
+		if ( is_array( $hit ) ) {
+			return $hit;
+		}
+		$o     = self::raw();
+		$token = self::token( 'fbUserToken' ) ? self::token( 'fbUserToken' ) : self::token( 'fbToken' );
+		if ( ! $o['igBizId'] || ! $token ) {
+			return new \WP_Error( 'foxi_igu_none', __( 'To show Instagram by username, first connect a Facebook Page with a linked Instagram Business account in Foxi › Settings › Social media.', 'foxi-builder' ) );
+		}
+		$fields = 'business_discovery.username(' . $u . '){username,profile_picture_url,media.limit(25){id,caption,media_type,media_url,thumbnail_url,permalink,timestamp}}';
+		$res    = self::request( self::FB . rawurlencode( $o['igBizId'] ) . '?' . http_build_query( array( 'fields' => $fields, 'access_token' => $token ) ) );
+		if ( is_wp_error( $res ) ) {
+			if ( false !== stripos( $res->get_error_message(), 'invalid user id' ) || false !== stripos( $res->get_error_message(), 'cannot be found' ) ) {
+				/* translators: %s: Instagram username */
+				$res = new \WP_Error( 'foxi_igu', sprintf( __( 'Instagram didn’t find @%s as a public Business or Creator account. Check the spelling, and that the account is set to Business or Creator in the Instagram app.', 'foxi-builder' ), $u ) );
+			}
+			$last = get_option( $key . '_last' );
+			if ( is_array( $last ) && $last ) {
+				set_transient( $key, $last, HOUR_IN_SECONDS );
+				return $last;
+			}
+			return $res;
+		}
+		$out = array();
+		foreach ( isset( $res['business_discovery']['media']['data'] ) ? $res['business_discovery']['media']['data'] : array() as $m ) {
+			$video = 'VIDEO' === ( $m['media_type'] ?? '' );
+			$image = $video ? ( $m['thumbnail_url'] ?? '' ) : ( $m['media_url'] ?? '' );
+			if ( ! $image ) {
+				continue; // Some videos come without a picture; skip them.
+			}
+			$out[] = array(
+				'id'      => 'ig_' . sanitize_key( $m['id'] ?? md5( $image ) ),
+				'network' => 'instagram',
+				'image'   => esc_url_raw( $image ),
+				'video'   => $video,
+				'album'   => 'CAROUSEL_ALBUM' === ( $m['media_type'] ?? '' ),
+				'caption' => isset( $m['caption'] ) ? sanitize_textarea_field( $m['caption'] ) : '',
+				'url'     => esc_url_raw( $m['permalink'] ?? '' ),
+				'date'    => isset( $m['timestamp'] ) ? gmdate( 'c', strtotime( $m['timestamp'] ) ) : '',
+				'author'  => $u,
+			);
+		}
+		set_transient( $key, $out, max( 6, (int) $o['cacheHours'] ) * HOUR_IN_SECONDS );
+		update_option( $key . '_last', $out, false );
+		return $out;
 	}
 
 	private static function cached( $net ) {
