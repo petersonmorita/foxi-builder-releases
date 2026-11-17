@@ -153,12 +153,29 @@ class Nav extends Base {
 		);
 	}
 
-	/** A menu item description that is a colour ("#896D5F") becomes the item's dot colour (switcher menus). */
-	public static function item_dot( $atts, $item, $args ) {
-		if ( isset( $args->menu_class ) && 'fx-nav__menu' === $args->menu_class && self::is_hex( trim( (string) $item->description ) ) ) {
-			$atts['style'] = '--fx-dot:' . trim( (string) $item->description );
+	/**
+	 * A menu item description that is a colour ("#896D5F") becomes that tab's
+	 * colour (switcher menus), with dark or light text to suit it.
+	 */
+	public static function item_tab( $atts, $item, $args ) {
+		$hex = trim( (string) $item->description );
+		if ( isset( $args->menu_class ) && 'fx-nav__menu' === $args->menu_class && self::is_hex( $hex ) ) {
+			$atts['style'] = '--fx-tab:' . $hex . ';--fx-tab-ink:' . ( self::is_light( $hex ) ? '#1d1d1f' : '#fff' );
 		}
 		return $atts;
+	}
+
+	private static function is_light( $hex ) {
+		$h = ltrim( $hex, '#' );
+		if ( strlen( $h ) < 6 ) {
+			$h = $h[0] . $h[0] . $h[1] . $h[1] . $h[2] . $h[2];
+		}
+		$lum = 0;
+		foreach ( array( 0.2126, 0.7152, 0.0722 ) as $i => $w ) {
+			$c    = hexdec( substr( $h, $i * 2, 2 ) ) / 255;
+			$lum += $w * ( $c <= 0.03928 ? $c / 12.92 : pow( ( $c + 0.055 ) / 1.055, 2.4 ) );
+		}
+		return $lum > 0.2; // Above this, dark text has the better contrast.
 	}
 
 	private static function is_hex( $value ) {
@@ -197,7 +214,7 @@ class Nav extends Base {
 		if ( $menu_id && wp_get_nav_menu_object( $menu_id ) ) {
 			add_filter( 'walker_nav_menu_start_el', array( __CLASS__, 'item_extras' ), 9, 4 );
 			add_filter( 'walker_nav_menu_start_el', array( __CLASS__, 'sub_toggle' ), 10, 4 );
-			add_filter( 'nav_menu_link_attributes', array( __CLASS__, 'item_dot' ), 10, 3 );
+			add_filter( 'nav_menu_link_attributes', array( __CLASS__, 'item_tab' ), 10, 3 );
 			$menu = wp_nav_menu(
 				array(
 					'menu'        => $menu_id,
@@ -211,7 +228,7 @@ class Nav extends Base {
 			);
 			remove_filter( 'walker_nav_menu_start_el', array( __CLASS__, 'item_extras' ), 9 );
 			remove_filter( 'walker_nav_menu_start_el', array( __CLASS__, 'sub_toggle' ), 10 );
-			remove_filter( 'nav_menu_link_attributes', array( __CLASS__, 'item_dot' ), 10 );
+			remove_filter( 'nav_menu_link_attributes', array( __CLASS__, 'item_tab' ), 10 );
 		}
 		self::$switcher = false;
 		if ( ! $menu ) {
