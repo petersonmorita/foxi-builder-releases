@@ -4,7 +4,7 @@ Tags: page builder, visual editor, blocks, seo, starter sites
 Requires at least: 6.6
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.10.0
+Stable tag: 1.11.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,6 +47,14 @@ Import the Panorama Retreat template: the full panoramaretreat.com.au website (1
 4. Edit any page: Foxi Studio opens automatically.
 
 == Changelog ==
+
+= 1.11.0 =
+* Mega menus: give a top-level menu item the CSS class "fx-mega" and its sub-items show as a wide multi-column panel (second level = column headings, third level = links). Collapses neatly into the mobile menu.
+* Menu icons and descriptions: add "fx-ico-" plus a Lucide icon name (e.g. fx-ico-wrench) as a menu item's CSS class for an icon, and fill in its Description for a second line under the link.
+* Menu block: new "Switcher tabs" style for a slim row of tabs, e.g. links between sister websites. It stays visible on phones (short labels from each item's Title Attribute), highlights the item with the "current-site" class, and shows a coloured dot when an item's description is a colour.
+* Forms: radio buttons and checkboxes can show as buttons or large cards ("Show options as"). On a page of its own, picking a button or card answer moves straight to the next page.
+* Site kits can now carry complete forms (steps, rules and emails), menu item classes, descriptions and title attributes.
+* Fixed icons in icon lists sitting slightly above their text.
 
 = 1.10.0 =
 * New Before & After block (Media): two photos with a handle visitors drag to compare them. Side to side or top to bottom, circle, pill or line handle, optional Before/After labels, photo shape, colours, a one-time nudge so people know it moves, and an option to follow the mouse. Works with the keyboard and screen readers. In the editor, drag the handle to set where it starts.

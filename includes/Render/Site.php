@@ -100,11 +100,69 @@ class Logo extends Base {
 class Nav extends Base {
 	const NAME = 'foxi/nav';
 
+	/** @var bool Rendering a switcher menu (short labels from the "Title Attribute" field). */
+	private static $switcher = false;
+
 	public static function sub_toggle( $output, $item, $depth, $args ) {
 		if ( isset( $args->menu_class ) && 'fx-nav__menu' === $args->menu_class && in_array( 'menu-item-has-children', (array) $item->classes, true ) ) {
 			$output .= '<button type="button" class="fx-nav__sub-toggle" aria-expanded="false" aria-label="' . esc_attr( sprintf( /* translators: %s menu item */ __( 'Show submenu for %s', 'foxi-builder' ), wp_strip_all_tags( $item->title ) ) ) . '">' . foxi_icon( 'lucide:chevron-down' ) . '</button>';
 		}
 		return $output;
+	}
+
+	/**
+	 * Menu item extras: an icon from an "fx-ico-{lucide name}" CSS class and,
+	 * below the top level, the item's description as a second line.
+	 */
+	public static function item_extras( $output, $item, $depth, $args ) {
+		if ( ! isset( $args->menu_class ) || 'fx-nav__menu' !== $args->menu_class ) {
+			return $output;
+		}
+		$icon = '';
+		foreach ( (array) $item->classes as $class ) {
+			if ( 0 === strpos( (string) $class, 'fx-ico-' ) ) {
+				$name = sanitize_key( substr( (string) $class, 7 ) );
+				$icon = $name ? '<span class="fx-nav__icon" aria-hidden="true">' . foxi_icon( 'lucide:' . $name ) . '</span>' : '';
+				break;
+			}
+		}
+		$short = trim( (string) $item->attr_title );
+		if ( self::$switcher && 0 === $depth && '' !== $short ) {
+			// Switcher tabs: a shorter label on phones, from the item's "Title Attribute".
+			return preg_replace_callback(
+				'/(<a\b[^>]*>)(.*?)(<\/a>)/s',
+				static function ( $m ) use ( $short ) {
+					return $m[1] . '<span class="fx-nav__full">' . $m[2] . '</span><span class="fx-nav__short">' . esc_html( $short ) . '</span>' . $m[3];
+				},
+				$output,
+				1
+			);
+		}
+		$desc = trim( wp_strip_all_tags( (string) $item->description ) );
+		$desc = $depth > 0 && '' !== $desc && ! self::is_hex( $desc ) ? '<span class="fx-nav__desc">' . esc_html( $desc ) . '</span>' : '';
+		if ( ! $icon && ! $desc ) {
+			return $output;
+		}
+		return preg_replace_callback(
+			'/(<a\b[^>]*>)(.*?)(<\/a>)/s',
+			static function ( $m ) use ( $icon, $desc ) {
+				return $m[1] . $icon . '<span class="fx-nav__label">' . $m[2] . $desc . '</span>' . $m[3];
+			},
+			$output,
+			1
+		);
+	}
+
+	/** A menu item description that is a colour ("#896D5F") becomes the item's dot colour (switcher menus). */
+	public static function item_dot( $atts, $item, $args ) {
+		if ( isset( $args->menu_class ) && 'fx-nav__menu' === $args->menu_class && self::is_hex( trim( (string) $item->description ) ) ) {
+			$atts['style'] = '--fx-dot:' . trim( (string) $item->description );
+		}
+		return $atts;
+	}
+
+	private static function is_hex( $value ) {
+		return (bool) preg_match( '/^#[0-9a-f]{3,8}$/i', (string) $value );
 	}
 
 	private static function fallback_menu() {
@@ -132,9 +190,14 @@ class Nav extends Base {
 			$menu_id   = ! empty( $locations['foxi-primary'] ) ? (int) $locations['foxi-primary'] : 0;
 		}
 
-		$menu = '';
+		// "Switcher": a slim row of tabs (e.g. sister websites) that never folds into the mobile menu.
+		$switcher       = isset( $a['variant'] ) && 'switcher' === $a['variant'];
+		$menu           = '';
+		self::$switcher = $switcher;
 		if ( $menu_id && wp_get_nav_menu_object( $menu_id ) ) {
+			add_filter( 'walker_nav_menu_start_el', array( __CLASS__, 'item_extras' ), 9, 4 );
 			add_filter( 'walker_nav_menu_start_el', array( __CLASS__, 'sub_toggle' ), 10, 4 );
+			add_filter( 'nav_menu_link_attributes', array( __CLASS__, 'item_dot' ), 10, 3 );
 			$menu = wp_nav_menu(
 				array(
 					'menu'        => $menu_id,
@@ -146,19 +209,23 @@ class Nav extends Base {
 					'fallback_cb' => false,
 				)
 			);
+			remove_filter( 'walker_nav_menu_start_el', array( __CLASS__, 'item_extras' ), 9 );
 			remove_filter( 'walker_nav_menu_start_el', array( __CLASS__, 'sub_toggle' ), 10 );
+			remove_filter( 'nav_menu_link_attributes', array( __CLASS__, 'item_dot' ), 10 );
 		}
+		self::$switcher = false;
 		if ( ! $menu ) {
 			$menu = self::fallback_menu();
 		}
 
 		$collapse = in_array( isset( $a['collapse'] ) ? $a['collapse'] : 'tablet', array( 'tablet', 'mobile', 'never' ), true ) ? $a['collapse'] : 'tablet';
+		$collapse = $switcher ? 'never' : $collapse;
 		$style    = isset( $a['mobileStyle'] ) && 'fullscreen' === $a['mobileStyle'] ? 'fullscreen' : 'drawer';
 		$label    = ! empty( $a['label'] ) ? $a['label'] : __( 'Main', 'foxi-builder' );
 
 		return sprintf(
 			'<nav %1$s><button type="button" class="fx-nav__toggle" aria-expanded="false" aria-controls="fx-nav-%2$s"><span class="fx-nav__bars" aria-hidden="true"><span></span></span><span class="screen-reader-text">%3$s</span></button><div class="fx-nav__panel" id="fx-nav-%2$s"><button type="button" class="fx-nav__close" aria-label="%4$s">%5$s</button>%6$s</div></nav>',
-			self::wrapper( $a, array( 'fx-nav--collapse-' . $collapse, 'fx-nav--' . $style ), array( 'aria-label' => $label, 'data-fx-nav' => true ) ),
+			self::wrapper( $a, array_merge( array( 'fx-nav--collapse-' . $collapse, 'fx-nav--' . $style ), $switcher ? array( 'fx-nav--switcher' ) : array() ), array( 'aria-label' => $label, 'data-fx-nav' => true ) ),
 			esc_attr( $uid ),
 			esc_html__( 'Menu', 'foxi-builder' ),
 			esc_attr__( 'Close menu', 'foxi-builder' ),

@@ -234,7 +234,19 @@ class Starters {
 	 */
 	private static function saved_forms( array $nodes, array &$made ) {
 		foreach ( $nodes as &$node ) {
-			if ( 'foxi/form' === $node['name'] && empty( $node['attrs']['formId'] ) && ! empty( $node['attrs']['fields'] ) ) {
+			if ( 'foxi/form' === $node['name'] && empty( $node['attrs']['formId'] ) && ! empty( $node['attrs']['form'] ) && is_array( $node['attrs']['form'] ) ) {
+				// A complete Foxi › Forms form (steps, choices, rules, emails) carried in the kit.
+				$def = $node['attrs']['form'];
+				$key = md5( wp_json_encode( $def ) );
+				if ( ! isset( $made[ $key ] ) ) {
+					$new          = Forms\Store::create( isset( $def['title'] ) && '' !== $def['title'] ? $def['title'] : __( 'Contact form', 'foxi-builder' ), $def );
+					$made[ $key ] = is_wp_error( $new ) ? 0 : $new;
+				}
+				unset( $node['attrs']['form'] );
+				if ( $made[ $key ] ) {
+					$node['attrs']['formId'] = $made[ $key ];
+				}
+			} elseif ( 'foxi/form' === $node['name'] && empty( $node['attrs']['formId'] ) && ! empty( $node['attrs']['fields'] ) ) {
 				$a   = $node['attrs'];
 				$key = md5( wp_json_encode( array( $a['fields'], isset( $a['subject'] ) ? $a['subject'] : '' ) ) );
 				if ( ! isset( $made[ $key ] ) ) {
@@ -592,6 +604,15 @@ class Starters {
 				'menu-item-parent-id' => $parent,
 				'menu-item-position'  => $i + 1,
 			);
+			if ( ! empty( $item['classes'] ) ) {
+				$args['menu-item-classes'] = implode( ' ', array_map( 'sanitize_html_class', preg_split( '/\s+/', trim( (string) $item['classes'] ) ) ) );
+			}
+			if ( isset( $item['attrTitle'] ) && '' !== $item['attrTitle'] ) {
+				$args['menu-item-attr-title'] = sanitize_text_field( (string) $item['attrTitle'] );
+			}
+			if ( isset( $item['description'] ) && '' !== $item['description'] ) {
+				$args['menu-item-description'] = sanitize_text_field( (string) $item['description'] );
+			}
 			$page = ! empty( $item['page'] ) ? get_page_by_path( self::slug_for( $item['page'], $ctx ) ) : null;
 			if ( $page ) {
 				$args['menu-item-type']      = 'post_type';
@@ -803,7 +824,17 @@ class Starters {
 			if ( (int) $item->menu_item_parent !== (int) $parent ) {
 				continue;
 			}
-			$row = array( 'title' => $item->title );
+			$row     = array( 'title' => $item->title );
+			$classes = trim( implode( ' ', array_filter( (array) $item->classes ) ) );
+			if ( '' !== $classes ) {
+				$row['classes'] = $classes;
+			}
+			if ( '' !== trim( (string) $item->attr_title ) ) {
+				$row['attrTitle'] = trim( (string) $item->attr_title );
+			}
+			if ( '' !== trim( (string) $item->description ) ) {
+				$row['description'] = trim( (string) $item->description );
+			}
 			if ( 'page' === $item->object && 'post_type' === $item->type ) {
 				$row['page'] = get_post_field( 'post_name', (int) $item->object_id );
 			} else {

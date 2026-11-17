@@ -265,6 +265,10 @@ class Store {
 			}
 			$out['options'] = $opts;
 			$out['inline']  = ! empty( $f['inline'] );
+			if ( 'select' !== $type ) {
+				// How radio buttons and checkboxes look: a plain list, buttons, or large tappable cards.
+				$out['look'] = in_array( isset( $f['look'] ) ? $f['look'] : '', array( 'list', 'buttons', 'cards' ), true ) ? $f['look'] : 'list';
+			}
 		}
 		if ( 'consent' === $type ) {
 			$out['text'] = isset( $f['text'] ) ? wp_kses( (string) $f['text'], array( 'a' => array( 'href' => true, 'target' => true, 'rel' => true ), 'strong' => array(), 'em' => array() ) ) : '';

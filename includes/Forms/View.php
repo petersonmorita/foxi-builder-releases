@@ -167,7 +167,7 @@ class View {
 				esc_attr( $lab_cl ),
 				esc_html( $f['label'] ),
 				$star,
-				! empty( $f['inline'] ) ? ' fx-form__choices--inline' : '',
+				( ! empty( $f['inline'] ) ? ' fx-form__choices--inline' : '' ) . ( ! empty( $f['look'] ) && 'list' !== $f['look'] ? ' fx-form__choices--' . sanitize_html_class( $f['look'] ) : '' ),
 				$items,
 				$help
 			);

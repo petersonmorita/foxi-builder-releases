@@ -30,6 +30,10 @@
 		"label": {
 			"type": "string",
 			"default": "Main"
+		},
+		"variant": {
+			"type": "string",
+			"default": "menu"
 		}
 	},
 	"supports": {
@@ -44,7 +48,12 @@
 			"linkHover": "& .fx-nav__menu > li > a:hover, & .fx-nav__menu > li.current-menu-item > a",
 			"dropdown": "& .sub-menu",
 			"dropdownLink": "& .sub-menu a",
-			"toggle": "& .fx-nav__toggle"
+			"toggle": "& .fx-nav__toggle",
+			"mega": "& .fx-mega > .sub-menu",
+			"megaHeading": "& .fx-mega > .sub-menu > li > a",
+			"megaLink": "& .fx-mega > .sub-menu > li > .sub-menu a",
+			"icon": "& .fx-nav__icon",
+			"desc": "& .fx-nav__desc"
 		}
 	}
 }
