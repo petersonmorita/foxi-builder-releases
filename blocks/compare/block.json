@@ -1,0 +1,88 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "foxi/compare",
+	"title": "Before & After",
+	"category": "foxi-media",
+	"description": "Two photos on top of each other with a handle visitors drag to compare them, e.g. before and after a renovation.",
+	"textdomain": "foxi-builder",
+	"keywords": [
+		"before",
+		"after",
+		"compare",
+		"comparison",
+		"slider",
+		"renovation"
+	],
+	"attributes": {
+		"fx": {
+			"type": "object",
+			"default": {}
+		},
+		"before": {
+			"type": "object",
+			"default": {}
+		},
+		"after": {
+			"type": "object",
+			"default": {}
+		},
+		"start": {
+			"type": "number",
+			"default": 50
+		},
+		"direction": {
+			"type": "string",
+			"default": "horizontal"
+		},
+		"ratio": {
+			"type": "string",
+			"default": "16/9"
+		},
+		"handle": {
+			"type": "string",
+			"default": "circle"
+		},
+		"follow": {
+			"type": "boolean",
+			"default": false
+		},
+		"labels": {
+			"type": "boolean",
+			"default": true
+		},
+		"labelsOn": {
+			"type": "string",
+			"default": "always"
+		},
+		"beforeLabel": {
+			"type": "string",
+			"default": "Before"
+		},
+		"afterLabel": {
+			"type": "string",
+			"default": "After"
+		},
+		"hint": {
+			"type": "boolean",
+			"default": true
+		},
+		"colors": {
+			"type": "object",
+			"default": {}
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"customClassName": true
+	},
+	"style": "foxi-blocks",
+	"foxi": {
+		"elements": {
+			"frame": "& .fx-compare__frame",
+			"handle": "& .fx-compare__knob",
+			"label": "& .fx-compare__label"
+		}
+	}
+}

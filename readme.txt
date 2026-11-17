@@ -4,7 +4,7 @@ Tags: page builder, visual editor, blocks, seo, starter sites
 Requires at least: 6.6
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.9.0
+Stable tag: 1.10.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,6 +47,9 @@ Import the Panorama Retreat template: the full panoramaretreat.com.au website (1
 4. Edit any page: Foxi Studio opens automatically.
 
 == Changelog ==
+
+= 1.10.0 =
+* New Before & After block (Media): two photos with a handle visitors drag to compare them. Side to side or top to bottom, circle, pill or line handle, optional Before/After labels, photo shape, colours, a one-time nudge so people know it moves, and an option to follow the mouse. Works with the keyboard and screen readers. In the editor, drag the handle to set where it starts.
 
 = 1.9.0 =
 * Social Feed: new "Instagram @name" source. Type any public Instagram Business or Creator username (e.g. each of your properties) and the block shows its latest posts in any design. It uses the Instagram account linked to the Facebook Page connected in Foxi › Settings › Social media (Meta's Business Discovery), so one connection serves every property. Posts update every 6 hours.
