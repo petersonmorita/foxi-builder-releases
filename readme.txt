@@ -4,7 +4,7 @@ Tags: page builder, visual editor, blocks, seo, starter sites
 Requires at least: 6.6
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.11.1
+Stable tag: 1.11.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,6 +47,10 @@ Import the Panorama Retreat template: the full panoramaretreat.com.au website (1
 4. Edit any page: Foxi Studio opens automatically.
 
 == Changelog ==
+
+= 1.11.2 =
+* Fix: a new Before & After block showed "This block has encountered an error" before both photos were chosen.
+* Before & After: "Replace before" and "Replace after" buttons in the block toolbar.
 
 = 1.11.1 =
 * Switcher tabs now look like folder tabs: the current site's tab joins the header bar below it with curved corners, and the other tabs sit beside it. A colour in a menu item's description now colours its tab (with dark or light text to suit) instead of showing a dot.
